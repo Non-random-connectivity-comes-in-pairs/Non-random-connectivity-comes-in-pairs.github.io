@@ -19,7 +19,8 @@ codeurl: 'https://github.com/bruth/jekyll-docs-template'
 
 # Default categories (in order) to appear in the navigation
 sections: [
-    ['code', 'CODE'],
+    ['two-point', 'TWO-POINT DISTRIB.'],
+    ['gamma', 'GAMMA DISTRIB.'],
     ['docs', 'DOCUMENTATION'],
     ['trouble', 'TROUBLESHOOTING']
 ]

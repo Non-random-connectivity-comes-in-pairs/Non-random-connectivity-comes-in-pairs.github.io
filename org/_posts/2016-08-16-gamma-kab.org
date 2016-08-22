@@ -3,10 +3,10 @@
 #+BEGIN_HTML
 ---
 layout: page
-title: Gamma distribution
+title: K(a,b)
 date: 2016-08-16
-category: code
-permalink: code/gamma-distribution
+category: gamma
+permalink: gamma/k-ab
 ---
 #+END_HTML
 

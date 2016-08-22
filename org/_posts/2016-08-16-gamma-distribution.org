@@ -1,0 +1,14 @@
+#+STARTUP: noindent showeverything
+#+OPTIONS: toc:nil; html-postamble:nil
+#+BEGIN_HTML
+---
+layout: page
+title: Gamma distribution
+date: 2016-08-16
+category: code
+permalink: code/gamma-distribution
+---
+#+END_HTML
+
+
+more

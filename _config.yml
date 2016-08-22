@@ -1,12 +1,12 @@
 # Site title and subtitle. This is used in _includes/header.html
-title: 'Anisotropic connectivity in local networks'
+title: 'Non-random connectivity comes in pairs'
 subtitle: 'Documentation for research article'
 
 # if you wish to integrate disqus on pages set your shortname here
 disqus_shortname: ''
 
 # if you use google analytics, add your tracking id here
-google_analytics_id: 'UA-71582159-3'
+google_analytics_id: ''
 
 # Enable/show navigation. There are there options:
 #   0 - always hide
@@ -19,7 +19,7 @@ codeurl: 'https://github.com/bruth/jekyll-docs-template'
 
 # Default categories (in order) to appear in the navigation
 sections: [
-    ['reproduce', 'REPRODUCIBILITY'],
+    ['code', 'CODE'],
     ['docs', 'DOCUMENTATION'],
     ['trouble', 'TROUBLESHOOTING']
 ]

@@ -2,11 +2,13 @@
 #+OPTIONS: toc:nil; html-postamble:nil
 #+BEGIN_HTML
 ---
-layout: default
-title: About
+layout: page
+title: Two-point distribution
+date: 2016-08-16
+category: code
+permalink: code/two-point
 ---
 #+END_HTML
 
-Tools
 
-
+more

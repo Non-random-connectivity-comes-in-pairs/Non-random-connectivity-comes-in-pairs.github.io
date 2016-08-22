@@ -1,0 +1,82 @@
+---
+layout: page
+title: Contour plot
+date: 2016-08-16
+category: two-point
+permalink: two-point/contour-plot
+---
+
+
+<p>
+The contour plot of Figure1<br  />
+</p>
+
+<img src="{{ site.baseurl }}/assets/img/contour_plot.png" width="60%" style="display:block;margin:2em auto 2em;"/>
+
+
+<p>
+was created using the following Python code<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900;">import</span> pylab <span style="color: #859900;">as</span> pl
+<span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
+
+<span style="color: #859900;">from</span> matplotlib <span style="color: #859900;">import</span> rc
+
+rc(<span style="color: #2aa198;">'text'</span>, usetex=<span style="color: #6c71c4;">True</span>)
+<span style="color: #b58900;">pl.rcParams</span>[<span style="color: #2aa198;">'text.latex.preamble'</span>] = [
+    r<span style="color: #2aa198;">'\usepackage{tgheros}'</span>,    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">helvetica font</span>
+    r<span style="color: #2aa198;">'\usepackage{sansmath}'</span>,   <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">math-font matching helvetica</span>
+    r<span style="color: #2aa198;">'\sansmath'</span>                <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">actually tell tex to use it!</span>
+    r<span style="color: #2aa198;">'\usepackage{siunitx}'</span>,    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">micro symbols</span>
+    r<span style="color: #2aa198;">'\sisetup{detect-all}'</span>,    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">force siunitx to use the fonts</span>
+]  
+
+
+<span style="color: #b58900;">rhos</span> = [1.1, 1.3, 1.6, 2.0, 3.0, 4.0, 6.0, 8.0, 9.5]
+<span style="color: #b58900;">mu</span> = 0.1
+
+<span style="color: #b58900;">s</span>=0.01
+
+<span style="color: #b58900;">xs</span> = np.arange(mu+s, 1.+s , s)
+<span style="color: #b58900;">ys</span> = np.arange(0. , 0.1+s, s)
+
+<span style="color: #b58900;">X</span>,<span style="color: #b58900;">Y</span> = np.meshgrid(xs,ys)
+
+<span style="color: #b58900;">curves</span> = (X+Y)/mu - (X*Y)/mu**2 
+
+<span style="color: #b58900;">fig</span> = pl.figure()
+fig.set_size_inches(4.2,2.8)
+<span style="color: #b58900;">ax</span> = fig.add_subplot(111)
+
+<span style="color: #b58900;">manual_locations</span> = [(0.15,0.095), (0.22,0.078), (0.28,0.065),
+                    (0.35,0.06), (0.48,0.05), (0.58,0.04),
+                    (0.78,0.026), (0.9,0.01) ]
+
+<span style="color: #b58900;">CS</span> = ax.contour(X,Y, curves, rhos,
+                colors=<span style="color: #2aa198;">'k'</span>, linestyles=[<span style="color: #2aa198;">'solid'</span>]*5+[<span style="color: #2aa198;">'dashed'</span>])
+
+ax.clabel(CS, fontsize=11, inline=1,
+          fmt=r<span style="color: #2aa198;">'$\varrho$ = %1.1f'</span>, manual=manual_locations)
+
+pl.ylabel(r<span style="color: #2aa198;">'$y$'</span>)
+pl.xlabel(r<span style="color: #2aa198;">'$x$'</span>)
+pl.xticks(<span style="color: #6c71c4;">list</span>(pl.xticks()[0]) + [0.1],
+          [<span style="color: #2aa198;">'0.1'</span>,<span style="color: #2aa198;">'0.2'</span>,<span style="color: #2aa198;">''</span>,<span style="color: #2aa198;">'0.4'</span>,<span style="color: #2aa198;">''</span>,<span style="color: #2aa198;">'0.6'</span>,<span style="color: #2aa198;">''</span>,<span style="color: #2aa198;">'0.8'</span>,<span style="color: #2aa198;">''</span>,<span style="color: #2aa198;">'1.0'</span>])
+
+
+pl.title(r<span style="color: #2aa198;">'$\mu = 0.1$'</span>)
+
+pl.savefig(<span style="color: #2aa198;">'contour_plot.pdf'</span>, dpi=600, bbox_inches=<span style="color: #2aa198;">'tight'</span>)
+</pre>
+</div>
+
+<p>
+Here, the expression for <code>curves</code> was used that is stated in the article and was derived in the article's supplementary materials.<br  />
+</p>
+
+<p>
+If you would like to reproduce the figure but don't have a LaTeX distribution available, just comment-out the code block importing the LaTeX packages.<br  />
+</p>

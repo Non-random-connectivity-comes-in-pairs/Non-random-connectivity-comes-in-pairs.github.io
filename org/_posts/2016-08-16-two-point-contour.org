@@ -10,14 +10,12 @@ permalink: two-point/contour-plot
 ---
 #+END_HTML
 
-
-The contour plot of Figure1 
+The contour plot of *Figure 1B*
 
 #+BEGIN_HTML
 <img src="{{ site.baseurl }}/assets/img/contour_plot.png" width="60%" style="display:block;margin:2em auto 2em;"/>
 #+END_HTML
   
-
 was created using the following Python code
 
 #+BEGIN_SRC python
@@ -75,5 +73,3 @@ pl.savefig('contour_plot.pdf', dpi=600, bbox_inches='tight')
 #+END_SRC
 
 Here, the expression for ~curves~ was used that is stated in the article and was derived in the article's supplementary materials.
-
-If you would like to reproduce the figure but don't have a LaTeX distribution available, just comment-out the code block importing the LaTeX packages. 

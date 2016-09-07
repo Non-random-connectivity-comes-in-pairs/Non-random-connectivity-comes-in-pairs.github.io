@@ -1,0 +1,124 @@
+---
+layout: page
+title: Figure 2A
+date: 2016-08-08
+category: gamma
+permalink: gamma/fig2A
+---
+
+<p>
+First compute for shape parameter a=0.248, a=1, a=2 and a=15 the respective b such . Then use . For this we're using the functions <code>gamma_functions</code> for<br  />
+</p>
+
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900;">import</span> pylab <span style="color: #859900;">as</span> pl
+<span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
+
+<span style="color: #859900;">from</span> scipy.optimize <span style="color: #859900;">import</span> brentq 
+<span style="color: #859900;">import</span> scipy.integrate <span style="color: #859900;">as</span> integrate
+<span style="color: #859900;">from</span> scipy.stats <span style="color: #859900;">import</span> gamma
+
+<span style="color: #859900;">from</span> gamma_functions <span style="color: #859900;">import</span> K, fT
+
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">for different values of a, determine b such that \mu = 0.1</span>
+<span style="color: #b58900;">mu</span> = 0.1
+
+<span style="color: #859900;">def</span> <span style="color: #268bd2;">root_f</span>(b):
+    <span style="color: #859900;">return</span> integrate.quad(<span style="color: #859900;">lambda</span> x: x*fT(x,a,b),0,1)[0] - mu
+
+<span style="color: #b58900;">a_ns</span> = [0.248,1.,2.,15.]
+<span style="color: #b58900;">b_ns</span> = [brentq(root_f, 0.5*mu/a, 5*mu/a) <span style="color: #859900;">for</span> a <span style="color: #859900;">in</span> a_ns]
+
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">for a,b pairing get the relative overrepresentation \rho</span>
+<span style="color: #859900;">def</span> <span style="color: #268bd2;">get_rho</span>(a,b):    
+    <span style="color: #b58900;">numer</span> = integrate.quad(<span style="color: #859900;">lambda</span> x:x**2*fT(x,a,b),0,1)[0]
+    <span style="color: #b58900;">denom</span> = (integrate.quad(<span style="color: #859900;">lambda</span> x: x*fT(x,a,b), 0,1)[0])**2    
+    <span style="color: #859900;">return</span> numer/denom
+
+<span style="color: #b58900;">rhos</span> = [get_rho(a,b) <span style="color: #859900;">for</span> a,b <span style="color: #859900;">in</span> <span style="color: #6c71c4;">zip</span>(a_ns, b_ns)]
+
+<span style="color: #859900;">print</span> <span style="color: #2aa198;">"a_ns: "</span>, a_ns
+<span style="color: #859900;">print</span> <span style="color: #2aa198;">"b_ns: "</span>, b_ns
+<span style="color: #859900;">print</span> <span style="color: #2aa198;">"rhos: "</span>, rhos
+</pre>
+</div>
+
+
+<p>
+Then to create the graphic<br  />
+</p>
+
+<img src="{{ site.baseurl }}/assets/img/gamma_figA.png" width="90%" style="display:block;margin:2em auto 2em;"/>
+
+<p>
+plot probability density functions for the \(a,b, \varrho\) pairings<br  />
+</p>
+
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900;">from</span> matplotlib <span style="color: #859900;">import</span> rc
+<span style="color: #859900;">from</span> matplotlib <span style="color: #859900;">import</span> gridspec
+
+rc(<span style="color: #2aa198;">'text'</span>, usetex=<span style="color: #6c71c4;">True</span>)
+<span style="color: #b58900;">pl.rcParams</span>[<span style="color: #2aa198;">'text.latex.preamble'</span>] = [
+    r<span style="color: #2aa198;">'\usepackage{tgheros}'</span>,    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">helvetica font</span>
+    r<span style="color: #2aa198;">'\usepackage{sansmath}'</span>,   <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">math-font matching  helvetica</span>
+    r<span style="color: #2aa198;">'\sansmath'</span>                <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">actually tell tex to use it!</span>
+    r<span style="color: #2aa198;">'\usepackage{siunitx}'</span>,    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">micro symbols</span>
+    r<span style="color: #2aa198;">'\sisetup{detect-all}'</span>,    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">force siunitx to use the fonts</span>
+]  
+
+
+<span style="color: #b58900;">fig</span>, <span style="color: #b58900;">ax</span> = pl.subplots(1,1)
+fig.set_size_inches(8.2,2.8)
+
+fig.suptitle(r<span style="color: #2aa198;">'$\mu = 0.1$'</span>, fontsize=15)
+
+<span style="color: #b58900;">gs</span> = gridspec.GridSpec(1,2, width_ratios = [3,1])
+<span style="color: #b58900;">ax_left</span> = pl.subplot(gs[0]) 
+<span style="color: #b58900;">ax_right</span> = pl.subplot(gs[1])
+
+<span style="color: #b58900;">x</span> = np.arange(0,1.+0.001, 0.001)
+
+<span style="color: #b58900;">linestyles</span> = [<span style="color: #2aa198;">'-'</span>,<span style="color: #2aa198;">':'</span>,<span style="color: #2aa198;">'--'</span>,<span style="color: #2aa198;">'-.'</span>]
+
+<span style="color: #859900;">for</span> a,b,rho,ls <span style="color: #859900;">in</span> <span style="color: #6c71c4;">zip</span>(a_ns, b_ns,rhos,linestyles):
+
+    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">quick sanity check</span>
+    <span style="color: #b58900;">h</span> = integrate.quad(<span style="color: #859900;">lambda</span> z: K(a,b)*gamma.pdf(z, a, scale=b),0,1.)[0]
+    <span style="color: #859900;">assert</span> <span style="color: #6c71c4;">abs</span>(1.-h) &lt; 10e-6
+
+    ax_left.plot(x, K(a,b)*gamma.pdf(x, a, scale=b),
+             <span style="color: #2aa198;">'k'</span>, label=r<span style="color: #2aa198;">'$\alpha = %g$, $\varrho = %.3g$'</span> %(a, rho),
+             linestyle=ls)
+
+
+ax_left.set_xlim(0,0.3)
+ax_left.set_ylim(0,16)
+ax_left.legend()
+
+<span style="color: #b58900;">label</span> = ax_left.set_xlabel(r<span style="color: #2aa198;">'connection probability $P_{ij}$'</span>)
+ax_left.xaxis.set_label_coords(0.8, -0.135)
+ax_left.set_ylabel(r<span style="color: #2aa198;">'$f(P_{ij})$'</span>)
+
+
+<span style="color: #859900;">for</span> a,b,rho,ls <span style="color: #859900;">in</span> <span style="color: #6c71c4;">zip</span>(a_ns, b_ns,rhos,linestyles):
+
+    ax_right.plot(x, gamma.pdf(x, a, scale=b), <span style="color: #2aa198;">'k'</span>, linestyle=ls)
+
+ax_right.set_xlim(0.3,1.0)
+ax_right.set_ylim(0,0.5)
+
+ax_right.set_xticks([0.3, 0.5, 0.8, 1.0])
+ax_right.set_yticks([0., 0.1, 0.2, 0.3,0.4, 0.5])
+
+ax_right.yaxis.tick_right()
+
+pl.savefig(<span style="color: #2aa198;">'gamma_figure_A.pdf'</span>, dpi=600, bbox_inches=<span style="color: #2aa198;">'tight'</span>)
+</pre>
+</div>

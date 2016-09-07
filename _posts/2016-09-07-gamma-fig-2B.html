@@ -1,0 +1,100 @@
+---
+layout: page
+title: Figure 2B
+date: 2016-08-07
+category: gamma
+permalink: gamma/fig2B
+---
+
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900;">from</span> gamma_functions <span style="color: #859900;">import</span> *
+
+<span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
+<span style="color: #859900;">from</span> scipy.optimize <span style="color: #859900;">import</span> brentq 
+<span style="color: #859900;">import</span> scipy.integrate <span style="color: #859900;">as</span> integrate
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">mu = \int_0^1 x f_ab(x) dx</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">Given mu,a what is b?</span>
+
+
+<span style="color: #859900;">def</span> <span style="color: #268bd2;">root_f</span>(b):
+
+    <span style="color: #859900;">return</span> integrate.quad(<span style="color: #859900;">lambda</span> x: x*fT(x,a,b),0,1)[0] - mu
+
+
+<span style="color: #b58900;">mu</span> = 0.1
+
+<span style="color: #b58900;">a_ns</span> = []
+<span style="color: #b58900;">b_ns</span> = []
+
+<span style="color: #859900;">for</span> a <span style="color: #859900;">in</span> np.logspace(np.log10(0.2),np.log10(98),500):
+
+    a_ns.append(a)
+
+    <span style="color: #b58900;">b</span> = brentq(root_f, 0.5*mu/a, 5*mu/a)
+
+    b_ns.append(b)
+
+    <span style="color: #859900;">print</span> a, <span style="color: #2aa198;">" "</span>, b
+
+
+np.save(<span style="color: #2aa198;">"data/a_ns.npy"</span>, a_ns)
+np.save(<span style="color: #2aa198;">"data/b_ns.npy"</span>, b_ns)
+</pre>
+</div>
+
+
+<img src="{{ site.baseurl }}/assets/img/gamma_figB.png" width="60%" style="display:block;margin:2em auto 2em;"/>
+
+
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900;">import</span> pylab <span style="color: #859900;">as</span> pl
+<span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
+
+<span style="color: #859900;">from</span> scipy.stats <span style="color: #859900;">import</span> gamma
+
+<span style="color: #859900;">import</span> matplotlib.ticker <span style="color: #859900;">as</span> ticker
+<span style="color: #859900;">from</span> matplotlib <span style="color: #859900;">import</span> rc
+
+rc(<span style="color: #2aa198;">'text'</span>, usetex=<span style="color: #6c71c4;">True</span>)
+<span style="color: #b58900;">pl.rcParams</span>[<span style="color: #2aa198;">'text.latex.preamble'</span>] = [
+    r<span style="color: #2aa198;">'\usepackage{tgheros}'</span>,    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">helvetica font</span>
+    r<span style="color: #2aa198;">'\usepackage{sansmath}'</span>,   <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">math-font matching  helvetica</span>
+    r<span style="color: #2aa198;">'\sansmath'</span>                <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">actually tell tex to use it!</span>
+    r<span style="color: #2aa198;">'\usepackage{siunitx}'</span>,    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">micro symbols</span>
+    r<span style="color: #2aa198;">'\sisetup{detect-all}'</span>,    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">force siunitx to use the fonts</span>
+]  
+
+
+<span style="color: #b58900;">a_ns</span> = np.load(<span style="color: #2aa198;">"data/a_ns.npy"</span>)
+<span style="color: #b58900;">b_ns</span> = np.load(<span style="color: #2aa198;">"data/b_ns.npy"</span>)
+
+
+<span style="color: #b58900;">fig</span>, <span style="color: #b58900;">ax</span> = pl.subplots(1,1)
+fig.set_size_inches(7.2*0.5,2.2)
+
+ax.plot(a_ns, b_ns , color=<span style="color: #2aa198;">'k'</span>, label=r<span style="color: #2aa198;">'$\mu=0.1$'</span>)
+ax.plot(a_ns, [0.1/a <span style="color: #859900;">for</span> a <span style="color: #859900;">in</span> a_ns], color=<span style="color: #2aa198;">'k'</span>,
+        linestyle=<span style="color: #2aa198;">'dashed'</span>, label=r<span style="color: #2aa198;">'$\beta = \frac{\mu}{\alpha}$'</span>)
+
+
+ax.set_xscale(<span style="color: #2aa198;">'log'</span>)
+
+ax.set_xlabel(r<span style="color: #2aa198;">'shape parameter $\alpha$'</span>)
+ax.set_ylabel(r<span style="color: #2aa198;">'scale parameter $\beta$'</span>)
+
+pl.xticks(<span style="color: #6c71c4;">sorted</span>(<span style="color: #6c71c4;">list</span>(pl.xticks()[0]) + [0.2]),
+          <span style="color: #6c71c4;">sorted</span>([<span style="color: #2aa198;">'0.2'</span>]+[<span style="color: #6c71c4;">str</span>(<span style="color: #6c71c4;">int</span>(x)) <span style="color: #859900;">for</span> x <span style="color: #859900;">in</span> <span style="color: #6c71c4;">list</span>(pl.xticks()[0])]))
+
+ax.set_yticks(np.arange(0.,0.9,0.2))
+ax.set_xlim(0.2,100)
+
+ax.legend()
+
+pl.savefig(<span style="color: #2aa198;">'gamma_figB.pdf'</span>, dpi=600, bbox_inches=<span style="color: #2aa198;">'tight'</span>)
+</pre>
+</div>

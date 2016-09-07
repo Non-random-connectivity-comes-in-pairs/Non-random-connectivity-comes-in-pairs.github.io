@@ -1,0 +1,31 @@
+#+STARTUP: noindent showeverything
+#+OPTIONS: toc:nil; html-postamble:nil
+#+BEGIN_HTML
+---
+layout: page
+title: Problems
+date: 2016-09-01
+category: trouble
+permalink: trouble/problems
+---
+#+END_HTML
+
+
+* Problems with LaTeX
+
+
+If you would like to reproduce the figures but don't have a LaTeX distribution available, just comment-out the code block below in the Python scripts that plot figures:
+
+#+BEGIN_SRC python
+from matplotlib import rc
+
+rc('text', usetex=True)
+pl.rcParams['text.latex.preamble'] = [
+    r'\usepackage{tgheros}',    # helvetica font
+    r'\usepackage{sansmath}',   # math-font matching helvetica
+    r'\sansmath'                # actually tell tex to use it!
+    r'\usepackage{siunitx}',    # micro symbols
+    r'\sisetup{detect-all}',    # force siunitx to use the fonts
+]  
+#+END_SRC
+

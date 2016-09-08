@@ -1,0 +1,133 @@
+---
+layout: page
+title: Fig 1A
+date: 2016-08-17
+category: two-point
+permalink: two-point/fig1A
+---
+
+<p>
+The illustration<br  />
+</p>
+
+<img src="{{ site.baseurl }}/assets/img/two_point_network.png" width="50%" style="display:block;margin:2em auto 2em;"/>
+
+<p>
+was created with TikZ using the following LaTeX code<br  />
+</p>
+
+
+<div class="org-src-container">
+
+<pre class="src src-latex"><span style="color: #859900;">\documentclass</span>{<span style="color: #6c71c4;">standalone</span>}
+
+<span style="color: #859900;">\usepackage</span>{<span style="color: #6c71c4;">tikz</span>}
+
+<span style="color: #859900;">\usetikzlibrary</span>{arrows.meta,decorations.pathmorphing,
+  backgrounds,positioning,fit,matrix, decorations, patterns}
+
+<span style="color: #859900;">\renewcommand</span>{<span style="color: #268bd2;">\familydefault</span>}{<span style="color: #859900;">\sfdefault</span>}
+<span style="color: #859900;">\usepackage</span>{<span style="color: #6c71c4;">tgheros</span>}
+<span style="color: #859900;">\usepackage</span>{<span style="color: #6c71c4;">sansmath</span>}
+<span style="color: #859900;">\usepackage</span>{<span style="color: #6c71c4;">siunitx</span>}
+<span style="color: #859900;">\usepackage</span>[english]{<span style="color: #6c71c4;">babel</span>}
+<span style="color: #859900;">\usepackage</span>[utf8]{<span style="color: #6c71c4;">inputenc</span>}
+<span style="color: #859900;">\usepackage</span>[T1]{<span style="color: #6c71c4;">fontenc</span>}
+
+<span style="color: #859900;">\begin</span>{<span style="color: #268bd2;">document</span>}
+
+
+<span style="color: #859900;">\begin</span>{<span style="color: #268bd2;">tikzpicture</span>}[font=<span style="color: #859900;">\sffamily\sansmath</span>]
+
+  <span style="color: #859900;">\pgfmathsetmacro</span>{<span style="color: #859900;">\shift</span>}{0.3ex}
+
+  <span style="color: #586e75; font-style: italic;">%%</span><span style="color: #657b83; font-style: italic;">\node[circle,thick,draw=gray, dashed, minimum size=3.2cm] (src) at (0,0) {};</span>
+
+  <span style="color: #859900;">\node</span>[draw,circle, thick, pattern=north east lines] (src) at (0,0) {};
+
+  <span style="color: #586e75; font-style: italic;">%% </span><span style="color: #657b83; font-style: italic;">\begin{scope}[every node/.style={circle,thick,draw, scale=1.}]</span>
+  <span style="color: #586e75; font-style: italic;">%%   </span><span style="color: #657b83; font-style: italic;">\node (src) at (0,0) {};</span>
+  <span style="color: #586e75; font-style: italic;">%% </span><span style="color: #657b83; font-style: italic;">\end{scope}</span>
+
+  <span style="color: #859900;">\def</span>\<span style="color: #268bd2;">XR</span>{2.6}
+  <span style="color: #859900;">\def</span>\<span style="color: #268bd2;">XL</span>{3.2}
+  <span style="color: #859900;">\def</span>\<span style="color: #268bd2;">YU</span>{3.}
+  <span style="color: #859900;">\def</span>\<span style="color: #268bd2;">YD</span>{3.}
+  <span style="color: #859900;">\begin</span>{<span style="color: #268bd2;">scope</span>}[every node/.style={}]
+    <span style="color: #859900;">\node</span> (ur) at (<span style="color: #859900;">\XR</span>,<span style="color: #859900;">\YU</span>) {};
+    <span style="color: #859900;">\node</span> (dr) at (<span style="color: #859900;">\XR</span>,-<span style="color: #859900;">\YD</span>) {};
+    <span style="color: #859900;">\node</span> (dl) at (-<span style="color: #859900;">\XL</span>, -<span style="color: #859900;">\YD</span>) {};
+    <span style="color: #859900;">\node</span> (ul) at (-<span style="color: #859900;">\XL</span>, <span style="color: #859900;">\YU</span>) {};
+  <span style="color: #859900;">\end</span>{<span style="color: #268bd2;">scope</span>}
+
+  <span style="color: #859900;">\begin</span>{<span style="color: #268bd2;">scope</span>}[every node/.style={circle,thick,draw, scale=1.}]
+    <span style="color: #859900;">\node</span> (t1) at (1.2,.4) {};
+    <span style="color: #859900;">\node</span> (t2) at (.4,-1.1) {};
+    <span style="color: #859900;">\node</span> (t3) at (-1.6,-0.1) {};
+  <span style="color: #859900;">\end</span>{<span style="color: #268bd2;">scope</span>}
+
+  <span style="color: #859900;">\begin</span>{<span style="color: #268bd2;">scope</span>}[every node/.style={circle,thick,draw, scale=1.}]
+    <span style="color: #859900;">\node</span> (d1) at (1.5,2.2) {};
+    <span style="color: #859900;">\node</span> (d2) at (-2.6,2.2) {};
+    <span style="color: #859900;">\node</span> (d3) at (2.2,-1.) {};
+    <span style="color: #859900;">\node</span> (d4) at (-0.25,1.7) {};
+  <span style="color: #859900;">\end</span>{<span style="color: #268bd2;">scope</span>}
+
+  <span style="color: #586e75; font-style: italic;">%% </span><span style="color: #657b83; font-style: italic;">Legend</span>
+  <span style="color: #859900;">\def</span>\<span style="color: #268bd2;">Llen</span>{-1.75} <span style="color: #657b83; font-style: italic;">% length of arrows</span>
+  <span style="color: #859900;">\def</span>\<span style="color: #268bd2;">Lytop</span>{-1.05} <span style="color: #657b83; font-style: italic;">% y-dist from top</span>
+  <span style="color: #859900;">\def</span>\<span style="color: #268bd2;">Lxright</span>{-0.3} <span style="color: #657b83; font-style: italic;">%x-dist from right</span>
+  <span style="color: #859900;">\def</span>\<span style="color: #268bd2;">Lysep</span>{-.8} <span style="color: #657b83; font-style: italic;">%y-dist between two arrows</span>
+  <span style="color: #859900;">\begin</span>{<span style="color: #268bd2;">scope</span>}[every node/.style={}]
+    <span style="color: #859900;">\node</span> (lul) at (-<span style="color: #859900;">\XL</span>-<span style="color: #859900;">\Llen</span>-<span style="color: #859900;">\Lxright</span>,-<span style="color: #859900;">\YD</span>-<span style="color: #859900;">\Lytop</span>) {};
+    <span style="color: #859900;">\node</span> (lur) at (-<span style="color: #859900;">\XL</span>-<span style="color: #859900;">\Lxright</span>,-<span style="color: #859900;">\YD</span>-<span style="color: #859900;">\Lytop</span>) {};
+    <span style="color: #859900;">\node</span> (ldl) at (-<span style="color: #859900;">\XL</span>-<span style="color: #859900;">\Llen</span>-<span style="color: #859900;">\Lxright</span>,-<span style="color: #859900;">\YD</span>-<span style="color: #859900;">\Lytop</span>-<span style="color: #859900;">\Lysep</span>) {};
+    <span style="color: #859900;">\node</span> (ldr) at (-<span style="color: #859900;">\XL</span>-<span style="color: #859900;">\Lxright</span>,-<span style="color: #859900;">\YD</span>-<span style="color: #859900;">\Lytop</span>-<span style="color: #859900;">\Lysep</span>) {};
+  <span style="color: #859900;">\end</span>{<span style="color: #268bd2;">scope</span>}
+
+
+  <span style="color: #859900;">\begin</span>{<span style="color: #268bd2;">scope</span>}[every path/.style={-{Latex[length=2mm]},
+                draw, solid, line width =0.7mm,
+                shorten &lt;= 5pt, shorten &gt;=5pt}]
+
+    <span style="color: #859900;">\pgfmathsetmacro</span>{<span style="color: #859900;">\shift</span>}{0.3ex}
+
+    <span style="color: #859900;">\path</span> [transform canvas={xshift=<span style="color: #859900;">\shift</span>,yshift=-<span style="color: #859900;">\shift</span>}] (src) -- (t1);
+    <span style="color: #859900;">\path</span> [transform canvas={xshift=-<span style="color: #859900;">\shift</span>,yshift=<span style="color: #859900;">\shift</span>}] (t1) -- (src);
+
+    <span style="color: #859900;">\path</span> [transform canvas={xshift=-<span style="color: #859900;">\shift</span>,yshift=-<span style="color: #859900;">\shift</span>}] (src) -- (t2);
+    <span style="color: #859900;">\path</span> [transform canvas={xshift=<span style="color: #859900;">\shift</span>,yshift= <span style="color: #859900;">\shift</span>}] (t2) -- (src);
+
+    <span style="color: #859900;">\path</span> [transform canvas={xshift=-<span style="color: #859900;">\shift</span>,yshift= <span style="color: #859900;">\shift</span>}] (src) -- (t3);
+    <span style="color: #859900;">\path</span> [transform canvas={xshift=<span style="color: #859900;">\shift</span>,yshift=-<span style="color: #859900;">\shift</span>}] (t3) -- (src);
+
+    <span style="color: #859900;">\path</span> [shorten &lt;= 0pt, shorten &gt;= 0pt] (ldr) -- node[above]{<span style="color: #2aa198;">$P_</span><span style="color: #2aa198;">{ij}</span><span style="color: #2aa198;">=x$</span>} (ldl);
+
+
+  <span style="color: #859900;">\end</span>{<span style="color: #268bd2;">scope</span>}
+
+  <span style="color: #859900;">\begin</span>{<span style="color: #268bd2;">scope</span>}[every path/.style={-{Latex[length=1mm, width=1mm]},
+                draw, solid, line width = 0.2mm,
+                shorten &lt;= 5pt, shorten &gt;=5pt}]
+
+      <span style="color: #859900;">\path</span> [transform canvas={xshift=-<span style="color: #859900;">\shift</span>,yshift= <span style="color: #859900;">\shift</span>}] (src) -- (d1);
+      <span style="color: #859900;">\path</span> [transform canvas={xshift= <span style="color: #859900;">\shift</span>,yshift=-<span style="color: #859900;">\shift</span>}] (d1) -- (src);
+
+      <span style="color: #859900;">\path</span> [transform canvas={xshift= <span style="color: #859900;">\shift</span>,yshift= <span style="color: #859900;">\shift</span>}] (src) -- (d2);
+      <span style="color: #859900;">\path</span> [transform canvas={xshift=-<span style="color: #859900;">\shift</span>,yshift=-<span style="color: #859900;">\shift</span>}] (d2) -- (src);
+
+      <span style="color: #859900;">\path</span> [transform canvas={xshift= <span style="color: #859900;">\shift</span>,yshift= <span style="color: #859900;">\shift</span>}] (src) -- (d3);
+      <span style="color: #859900;">\path</span> [transform canvas={xshift=-<span style="color: #859900;">\shift</span>,yshift=-<span style="color: #859900;">\shift</span>}] (d3) -- (src);
+
+      <span style="color: #859900;">\path</span> [transform canvas={xshift= <span style="color: #859900;">\shift</span>,yshift= <span style="color: #859900;">\shift</span>}] (src) -- (d4);
+      <span style="color: #859900;">\path</span> [transform canvas={xshift=-<span style="color: #859900;">\shift</span>,yshift=-<span style="color: #859900;">\shift</span>}] (d4) -- (src);
+
+      <span style="color: #859900;">\path</span> [shorten &lt;= 0pt, shorten &gt;= 0pt] (lur) --node[above]{<span style="color: #2aa198;">$P_</span><span style="color: #2aa198;">{ij}</span><span style="color: #2aa198;"> = y$</span>} (lul);
+
+  <span style="color: #859900;">\end</span>{<span style="color: #268bd2;">scope</span>}
+
+<span style="color: #859900;">\end</span>{<span style="color: #268bd2;">tikzpicture</span>}
+
+<span style="color: #859900;">\end</span>{<span style="color: #268bd2;">document</span>}
+</pre>
+</div>

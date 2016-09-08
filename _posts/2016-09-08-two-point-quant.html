@@ -1,0 +1,30 @@
+---
+layout: page
+title: statistic
+date: 2016-08-06
+category: two-point
+permalink: two-point-statistic
+---
+
+<p>
+Given \(\mu = 0.1\), \(x=0.7\) and \(\varrho = 4\) calculate the matching \(y\) and return \(p\), the fraction of highly connected pairs in the network.<br  />
+</p>
+
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
+
+<span style="color: #b58900;">mu</span> = 0.1
+<span style="color: #b58900;">rho</span> = 4.
+<span style="color: #b58900;">x</span> = 0.7
+
+<span style="color: #b58900;">y</span> = 1./(1/mu - x/mu**2) * (rho-x/mu)
+
+<span style="color: #859900;">print</span> <span style="color: #2aa198;">"y="</span>, y
+
+<span style="color: #b58900;">p</span> = (mu-y)/(x-y)
+
+<span style="color: #859900;">print</span> <span style="color: #2aa198;">"p="</span>, p
+</pre>
+</div>

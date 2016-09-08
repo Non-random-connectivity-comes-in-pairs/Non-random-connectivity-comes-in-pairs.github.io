@@ -11,6 +11,10 @@ permalink: gamma/fig2B
 #+END_HTML
 
 
+Compute for given shape parameter $\alpha$ the scale parameter $\beta$ such that the overall connection probability such that the overall connection probability equals $\mu=0.1$. 
+
+This is done for 500 pairs and will take several minutes to complete. The result is saved in ~data/~. 
+
 #+BEGIN_SRC python
 
 from gamma_functions import *
@@ -49,12 +53,13 @@ np.save("data/b_ns.npy", b_ns)
 
 #+END_SRC
 
+To plot the graphic 
 
 #+BEGIN_HTML
 <img src="{{ site.baseurl }}/assets/img/gamma_figB.png" width="60%" style="display:block;margin:2em auto 2em;"/>
 #+END_HTML
 
-
+the saved lists for $\alpha$ and $\beta$ are loaded and $\alpha$ is plotted versus $\beta$ and, for comparison, versus $\frac{\mu}{\alpha}$.
 
 #+BEGIN_SRC python
 

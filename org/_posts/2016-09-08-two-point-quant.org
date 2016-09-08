@@ -1,0 +1,33 @@
+#+STARTUP: noindent showeverything
+#+OPTIONS: toc:nil; html-postamble:nil
+#+BEGIN_HTML
+---
+layout: page
+title: statistic
+date: 2016-08-06
+category: two-point
+permalink: two-point-statistic
+---
+#+END_HTML
+
+Given $\mu = 0.1$, $x=0.7$ and $\varrho = 4$, calculate the matching $y$ and return $p$, the fraction of highly connected pairs in the network.
+
+
+#+BEGIN_SRC python
+
+import numpy as np
+
+mu = 0.1
+rho = 4.
+x = 0.7
+
+y = 1./(1/mu - x/mu**2) * (rho-x/mu)
+
+print "y=", y
+
+p = (mu-y)/(x-y)
+
+print "p=", p
+
+
+#+END_SRC

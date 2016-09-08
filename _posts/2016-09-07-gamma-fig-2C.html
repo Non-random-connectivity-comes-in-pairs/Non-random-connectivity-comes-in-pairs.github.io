@@ -6,6 +6,18 @@ category: gamma
 permalink: gamma/fig2C
 ---
 
+<p>
+For the \(\alpha\), \(\beta\) pairs created for <b>Figure 2B</b> calculate \(\varrho\) as<br  />
+</p>
+
+\begin{align}
+\varrho = \frac{\int_0^1 x^2 f^T_{\alpha,\beta}(x)\,dx}{\left(\int_0^1 x f^T_{\alpha,\beta}(x)\, dx\right)^2},
+\end{align} 
+
+<p>
+and save the results. This takes some time.<br  />
+</p>
+
 
 <div class="org-src-container">
 
@@ -36,9 +48,15 @@ np.save(<span style="color: #2aa198;">"data/rho_theoretical.npy"</span>, rhos)
 </pre>
 </div>
 
+<p>
+Then, to get<br  />
+</p>
 
 <img src="{{ site.baseurl }}/assets/img/gamma_figC.png" width="60%" style="display:block;margin:2em auto 2em;"/>
 
+<p>
+for given \(\alpha\) plot the \(\varrho\) as calculated a above and compare with the approximation \(1 + \frac{1}{\alpha}\).<br  />
+</p>
 
 
 <div class="org-src-container">

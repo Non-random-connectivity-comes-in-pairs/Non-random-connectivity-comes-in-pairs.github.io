@@ -1,0 +1,42 @@
+---
+layout: page
+title: statistic
+date: 2016-08-05
+category: gamma
+permalink: gamma/statistic
+---
+
+<p>
+Calculating the fraction of pairs that are connected with a probability higher than 0.01 is straight forward using the probability density function <code>fT</code> defined in <code>gamma_functions</code> and the <code>scipy.integrate</code> methods.<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
+
+<span style="color: #859900;">from</span> gamma_functions <span style="color: #859900;">import</span> *
+
+<span style="color: #859900;">from</span> scipy.optimize <span style="color: #859900;">import</span> brentq 
+<span style="color: #859900;">import</span> scipy.integrate <span style="color: #859900;">as</span> integrate
+
+<span style="color: #859900;">from</span> scipy.stats <span style="color: #859900;">import</span> gamma
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">from gamma_figure_A</span>
+<span style="color: #b58900;">a</span> = 0.248
+<span style="color: #b58900;">b</span> = 0.486852833106356
+
+<span style="color: #859900;">def</span> <span style="color: #268bd2;">get_rho</span>(a,b):    
+    <span style="color: #b58900;">numer</span> = integrate.quad(<span style="color: #859900;">lambda</span> x:x**2*fT(x,a,b),0,1)[0]
+    <span style="color: #b58900;">denom</span> = (integrate.quad(<span style="color: #859900;">lambda</span> x: x*fT(x,a,b), 0,1)[0])**2    
+    <span style="color: #859900;">return</span> numer/denom
+
+<span style="color: #859900;">assert</span> <span style="color: #6c71c4;">abs</span>(get_rho(a,b) - 4.) &lt; 10e-3
+
+<span style="color: #b58900;">p_cut</span> = 0.01
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">calculate 0.01 percentage</span>
+<span style="color: #b58900;">r</span> = integrate.quad(<span style="color: #859900;">lambda</span> z: K(a,b)*gamma.pdf(z, a, scale=b), p_cut,1.)[0]
+
+<span style="color: #859900;">print</span> <span style="color: #2aa198;">"%.4f of pairs are connected with chance higher than %.2f"</span> %(r,p_cut)
+</pre>
+</div>

@@ -10,7 +10,15 @@ permalink: gamma/fig2A
 ---
 #+END_HTML
 
-First compute for shape parameter a=0.248, a=1, a=2 and a=15 the respective b such . Then use . For this we're using the functions ~gamma_functions~ for 
+First compute for shape parameter $a=0.248$, $a=1$, $a=2$ and $a=15$ the respective scale parameter $b$ such that the overall connection probability equals $\mu = 0.1$. 
+
+Then we get the relative occurrence of bidirectionally connected pairs $\varrho$ via
+
+\begin{align}
+\varrho = \frac{\int_0^1 x^2 f^T_{\alpha,\beta}(x)\,dx}{\left(\int_0^1 x f^T_{\alpha,\beta}(x)\, dx\right)^2}.
+\end{align} 
+
+The probability density function ~fT~ was defined ~gamma_functions~ and is explained in the previous section.
 
 
 #+BEGIN_SRC python
@@ -52,13 +60,13 @@ print "rhos: ", rhos
 #+END_SRC
 
 
-Then to create the graphic
+With this we can create the graphic
 
 #+BEGIN_HTML
 <img src="{{ site.baseurl }}/assets/img/gamma_figA.png" width="90%" style="display:block;margin:2em auto 2em;"/>
 #+END_HTML
 
-plot probability density functions for the $a,b, \varrho$ pairings
+by plotting the probability density functions for the $a,b, \varrho$ pairings. We can use ~gamma.pdf~ from the ~scipy.stats~ and only have to scale it by ~K(a,b)~ to get the density function for the truncated version.
 
 
 #+BEGIN_SRC python

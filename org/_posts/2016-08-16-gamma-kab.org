@@ -48,3 +48,4 @@ def fT(x,a,b):
 #+END_SRC
 
 
+This script is used as ~gamma_functions.py~ in the subsequent calculations and plots for the network with gamma distributed connection probabilities.

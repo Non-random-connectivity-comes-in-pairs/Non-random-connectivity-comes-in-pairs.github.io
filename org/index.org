@@ -9,7 +9,9 @@ title: About
 
 * *About*
 
-Documentation for the research article "Non-random network connectivity comes in pairs"
+Documentation for the numerical computations and code for the research article /Non-random network connectivity comes in pairs/, Felix Z. Hoffmann, Jochen Triesch, 2016.
+
+A preprint is available at [[http://arxiv.org/abs/1609.04245][arXiv:1609.04245]].
 
 * *License*
 
@@ -43,4 +45,4 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 * *Author*
 
-You can find out more about the author, Felix Z. Hoffmann, on his website [[http://felix11h.github.io/]].
+You can find out more about the author, Felix Z. Hoffmann, at [[http://felix11h.github.io/]].

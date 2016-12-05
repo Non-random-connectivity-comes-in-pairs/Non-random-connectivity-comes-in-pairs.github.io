@@ -1,0 +1,12 @@
+#+STARTUP: noindent showeverything
+#+OPTIONS: toc:nil; html-postamble:nil
+#+BEGIN_HTML
+---
+layout: page
+title: Figure 3A
+date: 2016-11-27
+category: sym
+permalink: sym/fig3A
+---
+#+END_HTML
+

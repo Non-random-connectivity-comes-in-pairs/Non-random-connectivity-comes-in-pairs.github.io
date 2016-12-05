@@ -21,6 +21,7 @@ codeurl: 'https://github.com/bruth/jekyll-docs-template'
 sections: [
     ['two-point', 'TWO-POINT DISTRIB.'],
     ['gamma', 'GAMMA DISTRIB.'],
+    ['sym', 'SYMMETRY IN PAIRS'],
     ['docs', 'DOCUMENTATION'],
     ['trouble', 'TROUBLESHOOTING']
 ]

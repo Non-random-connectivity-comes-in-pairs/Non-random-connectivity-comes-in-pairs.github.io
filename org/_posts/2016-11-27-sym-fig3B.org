@@ -10,5 +10,156 @@ permalink: sym/fig3B
 ---
 #+END_HTML
 
+In the generalized model, the relative occurrence of bidirectional connections $\varrho$ depends on the width $\sigma$ of the modulating normal distribution. 
+
+It is 
+
+\begin{align}
+  \varrho = \frac{\operatorname{\mathbf{E}}(P_{ij} P_{ji})}{\mu^2},
+\end{align}
+
+where $\operatorname{\mathbf{E}}(P_{ij} P_{ji})$ is computed as the integral 
+
+\begin{align}
+  \operatorname{\mathbf{E}}(P_{ij}P_{ji}) = \int_0^1 \int_0^1 xy\,  f_{P_{ji} | P_{ij}}(y \mid x) f_{P_{ij}}(x) \, dx\, dy, \label{eq:dbint}
+\end{align}
+
+in which the conditional density function is defined as 
+
+\begin{align}
+  f_{P_{ji} | P_{ij}} (y \mid x) = \frac{1}{N_{\sigma}(x)} f_{P_{ji}}(y)\, \frac{1}{\sigma \sqrt{2 \pi}} \,e^{\frac{(y-x)^2}{2 \sigma^2}} \label{eq:fpijpji},
+\end{align}
+
+with normalizing factor $N_{\sigma}(x)^{-1}$  that makes sure that $f_{P_{ji}|P_{ij}} (y \mid x)$ integrates to one,
+
+\begin{align}
+  N_{\sigma}(x) = \int_0^1 f_{P_{ji}}(z)\, \frac{1}{\sigma \sqrt{2 \pi}}\, e^{\frac{(z-x)^2}{2 \sigma^2}} \,dz.
+\end{align}
+
+The overall connection probability $\mu$ is computed as 
+
+\begin{align}
+ \mu = \frac{1}{2} \int_0^1 x f_{P_{ij}}(x)\,dx + \frac{1}{2} \int_0^1 f_{P_{ij}}(x) \int_0^1 y \,f_{P_{ji}\vert P_{ij}}(y \mid x) \,dy \, dx.
+\end{align}
+
+@@html:<br />@@
+* *Generating the data*
+
+We generate the data to show this relationship at the example of the gamma distribution (Figure 2) in different ways:
+
+** Numerical integration
+
+In the numerical integration, using ~scipy.integrate.quad~ and ~scipy.integrate.dblquad~, the above equations are solved for the given probability density function $f_{P_{ij}}(y)$ and with $\sigma$. 
+
+#+BEGIN_SRC python
+
+import numpy as np
+
+from scipy import integrate
+from scipy.optimize import brentq
+from scipy.stats import norm
+
+from gamma_functions import K, fT
+
+
+
+class Gamma_network(object):
+
+    def __init__(self, a, mu):
+
+        self.a = a
+        self.mu = mu
+
+        self.b = self.get_b()
+
+        self.sigma = 1.
+
+        
+    def get_b(self):
+
+        root_f = lambda b: integrate.quad(
+            lambda x: x*fT(x,self.a,b),0,1)[0] - self.mu
+
+        return brentq(root_f, 0.5*self.mu/self.a, 5*self.mu/self.a)
+
+
+    def xyfxfye2(self,x,y):
+        numer =  x*y*fT(x,self.a,self.b)*fT(y,self.a,self.b)\
+                 *norm.pdf(y,loc=x, scale=self.sigma) 
+        denom =  integrate.quad(lambda y: fT(y,self.a,self.b)\
+                                * norm.pdf(y,loc=x, scale=self.sigma),
+                                0,1)[0]
+        return numer/denom
+
+
+    def yfxfye2(self,x,y):
+        numer =  y*fT(x,self.a,self.b)*fT(y,self.a,self.b)\
+                 *norm.pdf(y,loc=x, scale=self.sigma) 
+        denom =  integrate.quad(lambda y: fT(y,self.a,self.b)\
+                                *norm.pdf(y,loc=x, scale=self.sigma)
+                                ,0,1)[0]
+        return numer/denom
+    
+
+    def sim(self,sigma):
+
+        self.sigma = sigma
+
+        numer = integrate.dblquad(self.xyfxfye2, 0, 1,
+                                  lambda x: 0, lambda x: 1)[0]
+        denom_x = integrate.quad(lambda x: x*fT(x,self.a,self.b), 0,1)[0]
+        denom_y = integrate.dblquad(self.yfxfye2, 0, 1,
+                                    lambda x: 0, lambda x: 1)[0]
+        return numer, denom_x, denom_y
+        
+#+END_SRC
+
+Then to get the data, for example for $\alpha=1$, the following code is executed saving every data point as a dictionary item for full transparency and reproducibility.
+
+#+BEGIN_SRC python
+if __name__=="__main__":
+
+    import os, pickle
+    
+    label = "th_a1_mu01.p"
+
+    gn = Gamma_network(1, 0.1)
+    data_frame = []
+
+    with open("data/" + label, "wb") as pfile:
+        pickle.dump(data_frame, pfile)
+    
+    for sigma in np.arange(0.005,0.75005,0.005):
+
+        numer, denom_x, denom_y  = gn.sim(sigma)
+        print( sigma )
+        print( "\t numer       : ", numer )
+        print( "\t den_x, den_y: ", denom_x, ", ", denom_y )
+        print( "\t rho         : ", numer/(denom_x*denom_y) )
+        print( "\t alph, bet   : ", gn.a, ", ", gn.b )	
+
+        data = {}
+        data["alpha"] = gn.a
+        data["beta"] = gn.b
+        data["mu"] = gn.mu
+        data["sigma"] = sigma
+        data["numer"] = numer
+        data["den_x"] = denom_x
+        data["den_y"] = denom_y
+
+        data_frame.append(data)
+        
+        os.rename("data/" + label, "tmp/" + label)
+        with open("data/" + label, "wb") as pfile:
+            pickle.dump(data_frame, pfile)
+#+END_SRC
+
+
+** Sampling of connection probabilities
+
+
+** Computation in generated networks
+
+* *Plotting the figure*
 
 

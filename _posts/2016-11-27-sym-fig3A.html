@@ -1,0 +1,121 @@
+---
+layout: page
+title: Figure 3A
+date: 2016-11-28
+category: sym
+permalink: sym/fig3A
+---
+
+<p>
+In the generalized model the conditional density function is computed as<br  />
+</p>
+
+\begin{align}
+  f_{P_{ji} | P_{ij}} (y \mid x) = \frac{1}{N_{\sigma}(x)} f_{P_{ji}}(y)\, \frac{1}{\sigma \sqrt{2 \pi}} \,e^{\frac{(y-x)^2}{2 \sigma^2}},
+\end{align}
+
+<p>
+where \(N_{\sigma}(x)\) ensures that \(f_{P_{ji}|P_{ij}} (y \mid x)\) integrates to one,<br  />
+%<br  />
+</p>
+\begin{align}
+  N_{\sigma}(x) = \int_0^1 f_{P_{ji}}(z)\, \frac{1}{\sigma \sqrt{2 \pi}}\, e^{\frac{(z-x)^2}{2 \sigma^2}} \,dz.
+\end{align}
+
+<p>
+Figure 3A shows by the example of the gamma distribution  \(f^T_{\alpha,\beta}\) of Figure 2 how \(\sigma\) influences the shape of  \(f_{P_{ji} | P_{ij}} (y \mid x)\):<br  />
+</p>
+
+
+<img src="{{ site.baseurl }}/assets/img/fig3A.png" width="60%" style="display:block;margin:2em auto 2em;"/>
+
+
+<p>
+The figure is produced by the following code, requiring the <code>gamma_functions</code> from section <a href="{{ site.baseurl }}/gamma/k-ab">K(a,b)</a>.<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900;">import</span> matplotlib <span style="color: #859900;">as</span> mpl
+mpl.use(<span style="color: #2aa198;">'Agg'</span>)
+<span style="color: #859900;">import</span> pylab <span style="color: #859900;">as</span> pl
+
+<span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
+<span style="color: #859900;">from</span> gamma_functions <span style="color: #859900;">import</span> fT, K
+
+<span style="color: #859900;">from</span> scipy <span style="color: #859900;">import</span> integrate
+<span style="color: #859900;">from</span> scipy.stats <span style="color: #859900;">import</span> norm
+
+<span style="color: #859900;">from</span> matplotlib <span style="color: #859900;">import</span> rc
+
+rc(<span style="color: #2aa198;">'text'</span>, usetex=<span style="color: #6c71c4;">True</span>)
+<span style="color: #b58900;">pl.rcParams</span>[<span style="color: #2aa198;">'text.latex.preamble'</span>] = [
+    r<span style="color: #2aa198;">'\usepackage{tgheros}'</span>,    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">helvetica font</span>
+    r<span style="color: #2aa198;">'\usepackage{sansmath}'</span>,   <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">math-font matching  helvetica</span>
+    r<span style="color: #2aa198;">'\sansmath'</span>                <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">actually tell tex to use it!</span>
+    r<span style="color: #2aa198;">'\usepackage{siunitx}'</span>,    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">micro symbols</span>
+    r<span style="color: #2aa198;">'\sisetup{detect-all}'</span>,    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">force siunitx to use the fonts</span>
+]  
+
+
+<span style="color: #859900;">def</span> <span style="color: #268bd2;">gamma_sig_graph</span>(alph, bet, xloc, sig):
+    <span style="color: #2aa198;">'''</span>
+<span style="color: #2aa198;">    return graph of f^T_{\alpha,\beta}(y)</span>
+<span style="color: #2aa198;">    ----</span>
+<span style="color: #2aa198;">    alph : shape parameter alpha</span>
+<span style="color: #2aa198;">    bet  : scale parameter beta</span>
+<span style="color: #2aa198;">    xloc : already determined probability x</span>
+<span style="color: #2aa198;">    sig  : width of modulating normal distribution</span>
+<span style="color: #2aa198;">    '''</span>
+
+    <span style="color: #b58900;">ys</span>      = np.arange(0,1.+0.001, 0.001)
+    <span style="color: #b58900;">fT_vals</span> = []
+
+    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">compute normalization factor only once</span>
+    <span style="color: #b58900;">Nf</span> = integrate.quad(<span style="color: #859900;">lambda</span> s: fT(s,alph,bet)
+                         *norm.pdf(s,loc=xloc, scale=sig),0,1)[0]
+
+    <span style="color: #859900;">for</span> y <span style="color: #859900;">in</span> ys:
+        fT_vals.append(fT(y, alph, bet)
+                       *norm.pdf(y,loc=xloc,scale=sig)/Nf)
+
+    <span style="color: #859900;">return</span> ys, fT_vals
+
+
+<span style="color: #b58900;">fig</span>, <span style="color: #b58900;">ax</span> = pl.subplots(1,1)
+fig.set_size_inches(7.5*0.5,2.3)
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">from Figure 2</span>
+<span style="color: #b58900;">a_ns</span> =  [0.248, 1.0, 2.0, 15.0]
+<span style="color: #b58900;">b_ns</span> =  [0.486852833106356, 0.10004560945459162,
+         0.0500000206118813, 0.006666666666666667] 
+
+<span style="color: #b58900;">alph</span> = a_ns[0]
+<span style="color: #b58900;">bet</span>  = b_ns[0]
+<span style="color: #b58900;">xloc</span> = 0.15
+
+
+ax.axvline(x=0.15, ymin=0., ymax=16., color=<span style="color: #2aa198;">'k'</span>, linestyle=<span style="color: #2aa198;">":"</span>,
+           label=r<span style="color: #2aa198;">'$\sigma \to 0$'</span>)
+ax.plot(*gamma_sig_graph(alph,bet,xloc, 0.025),
+        <span style="color: #2aa198;">'k'</span>, linestyle=<span style="color: #2aa198;">'-.'</span>, label=r<span style="color: #2aa198;">'$\sigma = 0.025$'</span>)
+ax.plot(*gamma_sig_graph(alph,bet,xloc, 0.065),
+        <span style="color: #2aa198;">'k'</span>, linestyle=<span style="color: #2aa198;">'--'</span>, label=r<span style="color: #2aa198;">'$\sigma = 0.065$'</span>)
+ax.plot(*gamma_sig_graph(alph,bet,xloc, 1.),
+        <span style="color: #2aa198;">'k'</span>, linestyle=<span style="color: #2aa198;">'-'</span>, label=r<span style="color: #2aa198;">'$\sigma = 1$'</span>)
+
+ax.set_ylim(0,16)
+ax.set_xlim(0,0.4)
+
+pl.xticks([0.,0.15,0.3,0.4], [<span style="color: #2aa198;">'0.0'</span>, r<span style="color: #2aa198;">'$x=0.15$'</span>, <span style="color: #2aa198;">'0.3'</span>,<span style="color: #2aa198;">'0.4'</span>])
+ax.set_title(r<span style="color: #2aa198;">'$f_{P_{ij}}(y) = f_{\alpha,\beta}^T(y),\, \alpha=0.248$'</span>,
+             size=13.)
+
+ax.set_ylabel(r<span style="color: #2aa198;">'$f_{P_{ji} | P_{ij}}(y \mid x)$'</span>)
+ax.set_xlabel(r<span style="color: #2aa198;">'connection probability $y$'</span>)
+
+pl.legend(prop={<span style="color: #2aa198;">'size'</span>:12})
+
+pl.savefig(<span style="color: #2aa198;">'fig3A.pdf'</span>, dpi=600, bbox_inches=<span style="color: #2aa198;">'tight'</span>)
+</pre>
+</div>

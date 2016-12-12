@@ -1,0 +1,662 @@
+---
+layout: page
+title: Figure 3B
+date: 2016-11-27
+category: sym
+permalink: sym/fig3B
+---
+
+<p>
+In the generalized model, the relative occurrence of bidirectional connections \(\varrho\) depends on the width \(\sigma\) of the modulating normal distribution.<br  />
+</p>
+
+<p>
+It is<br  />
+</p>
+
+\begin{align}
+  \varrho = \frac{\operatorname{\mathbf{E}}(P_{ij} P_{ji})}{\mu^2},
+\end{align}
+
+<p>
+where \(\operatorname{\mathbf{E}}(P_{ij} P_{ji})\) is computed as the integral<br  />
+</p>
+
+\begin{align}
+  \operatorname{\mathbf{E}}(P_{ij}P_{ji}) = \int_0^1 \int_0^1 xy\,  f_{P_{ji} | P_{ij}}(y \mid x) f_{P_{ij}}(x) \, dx\, dy, \label{eq:dbint}
+\end{align}
+
+<p>
+in which the conditional density function is defined as<br  />
+</p>
+
+\begin{align}
+  f_{P_{ji} | P_{ij}} (y \mid x) = \frac{1}{N_{\sigma}(x)} f_{P_{ji}}(y)\, \frac{1}{\sigma \sqrt{2 \pi}} \,e^{\frac{(y-x)^2}{2 \sigma^2}} \label{eq:fpijpji},
+\end{align}
+
+<p>
+with normalizing factor \(N_{\sigma}(x)^{-1}\)  that makes sure that \(f_{P_{ji}|P_{ij}} (y \mid x)\) integrates to one,<br  />
+</p>
+
+\begin{align}
+  N_{\sigma}(x) = \int_0^1 f_{P_{ji}}(z)\, \frac{1}{\sigma \sqrt{2 \pi}}\, e^{\frac{(z-x)^2}{2 \sigma^2}} \,dz.
+\end{align}
+
+<p>
+The overall connection probability \(\mu\) is computed as<br  />
+</p>
+
+\begin{align}
+ \mu = \frac{1}{2} \int_0^1 x f_{P_{ij}}(x)\,dx + \frac{1}{2} \int_0^1 f_{P_{ij}}(x) \int_0^1 y \,f_{P_{ji}\vert P_{ij}}(y \mid x) \,dy \, dx.
+\end{align}
+
+<p>
+<br /><br  />
+</p>
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><b>Generating the data</b></h2>
+<div class="outline-text-2" id="text-1">
+<p>
+We generate the data to show this relationship at the example of the gamma distribution (Figure 2) in three different ways:<br  />
+</p>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1">Numerical integration</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+In the numerical integration, using <code>scipy.integrate.quad</code> and <code>scipy.integrate.dblquad</code>, the above equations are solved for the given probability density function \(f_{P_{ij}}(y)\) and with \(\sigma\).<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
+
+<span style="color: #859900;">from</span> scipy <span style="color: #859900;">import</span> integrate
+<span style="color: #859900;">from</span> scipy.optimize <span style="color: #859900;">import</span> brentq
+<span style="color: #859900;">from</span> scipy.stats <span style="color: #859900;">import</span> norm
+
+<span style="color: #859900;">from</span> gamma_functions <span style="color: #859900;">import</span> K, fT
+
+
+
+<span style="color: #859900;">class</span> <span style="color: #b58900;">Gamma_network</span>(<span style="color: #6c71c4;">object</span>):
+
+    <span style="color: #859900;">def</span> <span style="color: #268bd2;">__init__</span>(<span style="color: #859900;">self</span>, a, mu):
+
+        <span style="color: #859900;">self</span>.a = a
+        <span style="color: #859900;">self</span>.mu = mu
+
+        <span style="color: #859900;">self</span>.b = <span style="color: #859900;">self</span>.get_b()
+
+        <span style="color: #859900;">self</span>.sigma = 1.
+
+
+    <span style="color: #859900;">def</span> <span style="color: #268bd2;">get_b</span>(<span style="color: #859900;">self</span>):
+
+        <span style="color: #b58900;">root_f</span> = <span style="color: #859900;">lambda</span> b: integrate.quad(
+            <span style="color: #859900;">lambda</span> x: x*fT(x,<span style="color: #859900;">self</span>.a,b),0,1)[0] - <span style="color: #859900;">self</span>.mu
+
+        <span style="color: #859900;">return</span> brentq(root_f, 0.5*<span style="color: #859900;">self</span>.mu/<span style="color: #859900;">self</span>.a, 5*<span style="color: #859900;">self</span>.mu/<span style="color: #859900;">self</span>.a)
+
+
+    <span style="color: #859900;">def</span> <span style="color: #268bd2;">xyfxfye2</span>(<span style="color: #859900;">self</span>,x,y):
+        <span style="color: #b58900;">numer</span> =  x*y*fT(x,<span style="color: #859900;">self</span>.a,<span style="color: #859900;">self</span>.b)*fT(y,<span style="color: #859900;">self</span>.a,<span style="color: #859900;">self</span>.b)\
+                 *norm.pdf(y,loc=x, scale=<span style="color: #859900;">self</span>.sigma) 
+        <span style="color: #b58900;">denom</span> =  integrate.quad(<span style="color: #859900;">lambda</span> y: fT(y,<span style="color: #859900;">self</span>.a,<span style="color: #859900;">self</span>.b)\
+                                * norm.pdf(y,loc=x, scale=<span style="color: #859900;">self</span>.sigma),
+                                0,1)[0]
+        <span style="color: #859900;">return</span> numer/denom
+
+
+    <span style="color: #859900;">def</span> <span style="color: #268bd2;">yfxfye2</span>(<span style="color: #859900;">self</span>,x,y):
+        <span style="color: #b58900;">numer</span> =  y*fT(x,<span style="color: #859900;">self</span>.a,<span style="color: #859900;">self</span>.b)*fT(y,<span style="color: #859900;">self</span>.a,<span style="color: #859900;">self</span>.b)\
+                 *norm.pdf(y,loc=x, scale=<span style="color: #859900;">self</span>.sigma) 
+        <span style="color: #b58900;">denom</span> =  integrate.quad(<span style="color: #859900;">lambda</span> y: fT(y,<span style="color: #859900;">self</span>.a,<span style="color: #859900;">self</span>.b)\
+                                *norm.pdf(y,loc=x, scale=<span style="color: #859900;">self</span>.sigma)
+                                ,0,1)[0]
+        <span style="color: #859900;">return</span> numer/denom
+
+
+    <span style="color: #859900;">def</span> <span style="color: #268bd2;">sim</span>(<span style="color: #859900;">self</span>,sigma):
+
+        <span style="color: #859900;">self</span>.sigma = sigma
+
+        <span style="color: #b58900;">numer</span> = integrate.dblquad(<span style="color: #859900;">self</span>.xyfxfye2, 0, 1,
+                                  <span style="color: #859900;">lambda</span> x: 0, <span style="color: #859900;">lambda</span> x: 1)[0]
+        <span style="color: #b58900;">denom_x</span> = integrate.quad(<span style="color: #859900;">lambda</span> x: x*fT(x,<span style="color: #859900;">self</span>.a,<span style="color: #859900;">self</span>.b), 0,1)[0]
+        <span style="color: #b58900;">denom_y</span> = integrate.dblquad(<span style="color: #859900;">self</span>.yfxfye2, 0, 1,
+                                    <span style="color: #859900;">lambda</span> x: 0, <span style="color: #859900;">lambda</span> x: 1)[0]
+        <span style="color: #859900;">return</span> numer, denom_x, denom_y
+</pre>
+</div>
+
+<p>
+Then to get the data, for example for \(\alpha=1\), the following code is executed saving every data point as a dictionary item for full transparency and reproducibility.<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900;">if</span> <span style="color: #6c71c4;">__name__</span>==<span style="color: #2aa198;">"__main__"</span>:
+
+    <span style="color: #859900;">import</span> os, pickle
+
+    <span style="color: #b58900;">label</span> = <span style="color: #2aa198;">"th_a1_mu01.p"</span>
+
+    <span style="color: #b58900;">gn</span> = Gamma_network(1, 0.1)
+    <span style="color: #b58900;">data_frame</span> = []
+
+    <span style="color: #859900;">with</span> <span style="color: #6c71c4;">open</span>(<span style="color: #2aa198;">"data/"</span> + label, <span style="color: #2aa198;">"wb"</span>) <span style="color: #859900;">as</span> pfile:
+        pickle.dump(data_frame, pfile)
+
+    <span style="color: #859900;">for</span> sigma <span style="color: #859900;">in</span> np.arange(0.005,0.75005,0.005):
+
+        <span style="color: #b58900;">numer</span>, <span style="color: #b58900;">denom_x</span>, <span style="color: #b58900;">denom_y</span>  = gn.sim(sigma)
+        <span style="color: #859900;">print</span>( sigma )
+        <span style="color: #859900;">print</span>( <span style="color: #2aa198;">"\t numer       : "</span>, numer )
+        <span style="color: #859900;">print</span>( <span style="color: #2aa198;">"\t den_x, den_y: "</span>, denom_x, <span style="color: #2aa198;">", "</span>, denom_y )
+        <span style="color: #859900;">print</span>( <span style="color: #2aa198;">"\t rho         : "</span>, numer/(denom_x*denom_y) )
+        <span style="color: #859900;">print</span>( <span style="color: #2aa198;">"\t alph, bet   : "</span>, gn.a, <span style="color: #2aa198;">", "</span>, gn.b )  
+
+        <span style="color: #b58900;">data</span> = {}
+        <span style="color: #b58900;">data</span>[<span style="color: #2aa198;">"alpha"</span>] = gn.a
+        <span style="color: #b58900;">data</span>[<span style="color: #2aa198;">"beta"</span>] = gn.b
+        <span style="color: #b58900;">data</span>[<span style="color: #2aa198;">"mu"</span>] = gn.mu
+        <span style="color: #b58900;">data</span>[<span style="color: #2aa198;">"sigma"</span>] = sigma
+        <span style="color: #b58900;">data</span>[<span style="color: #2aa198;">"numer"</span>] = numer
+        <span style="color: #b58900;">data</span>[<span style="color: #2aa198;">"den_x"</span>] = denom_x
+        <span style="color: #b58900;">data</span>[<span style="color: #2aa198;">"den_y"</span>] = denom_y
+
+        data_frame.append(data)
+
+        os.rename(<span style="color: #2aa198;">"data/"</span> + label, <span style="color: #2aa198;">"tmp/"</span> + label)
+        <span style="color: #859900;">with</span> <span style="color: #6c71c4;">open</span>(<span style="color: #2aa198;">"data/"</span> + label, <span style="color: #2aa198;">"wb"</span>) <span style="color: #859900;">as</span> pfile:
+            pickle.dump(data_frame, pfile)
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2">Sampling of connection probabilities</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+The numerical integration becomes very resource demanding for specific distributions. In these situations we connection probabilities from the random variables and compute the mean overrepresentation \(\varrho\). To define random variables with the desired distributions <code>scipy.stats.rv_continuous</code> is used.<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
+<span style="color: #859900;">from</span> scipy.stats <span style="color: #859900;">import</span> norm
+<span style="color: #859900;">from</span> scipy.stats <span style="color: #859900;">import</span> rv_continuous
+<span style="color: #859900;">from</span> scipy.special <span style="color: #859900;">import</span> gamma
+<span style="color: #859900;">import</span> scipy.integrate <span style="color: #859900;">as</span> integrate
+<span style="color: #859900;">from</span> scipy.optimize <span style="color: #859900;">import</span> brentq
+
+<span style="color: #859900;">from</span> gamma_functions <span style="color: #859900;">import</span> fT,K
+
+
+<span style="color: #859900;">class</span> <span style="color: #b58900;">Rv_Mult_Norm</span>(rv_continuous):
+
+    <span style="color: #859900;">def</span> <span style="color: #268bd2;">__init__</span>(<span style="color: #859900;">self</span>, rv, x, sigma):
+
+        <span style="color: #859900;">self</span>.rv = rv
+        <span style="color: #859900;">self</span>.x = x
+        <span style="color: #859900;">self</span>.sigma = sigma
+
+        <span style="color: #859900;">self</span>.norm_f = <span style="color: #859900;">self</span>.compute_norm_f()
+
+        rv_continuous.__init__(<span style="color: #859900;">self</span>, a=0, b=1)
+
+    <span style="color: #859900;">def</span> <span style="color: #268bd2;">compute_norm_f</span>(<span style="color: #859900;">self</span>):
+        <span style="color: #859900;">return</span> integrate.quad(<span style="color: #859900;">lambda</span> y: <span style="color: #859900;">self</span>.rv.pdf(y)\
+                              *norm.pdf(y, loc=<span style="color: #859900;">self</span>.x, scale=<span style="color: #859900;">self</span>.sigma), 
+                              0, 1)[0]
+
+    <span style="color: #859900;">def</span> <span style="color: #268bd2;">_pdf</span>(<span style="color: #859900;">self</span>, y):
+        <span style="color: #859900;">return</span> <span style="color: #859900;">self</span>.rv.pdf(y)*norm.pdf(y, loc=<span style="color: #859900;">self</span>.x, scale=<span style="color: #859900;">self</span>.sigma)/<span style="color: #859900;">self</span>.norm_f
+
+
+<span style="color: #859900;">def</span> <span style="color: #268bd2;">sample_rv_mult_norm</span>(x, rv, sigma):
+
+    <span style="color: #b58900;">rv_mult_norm</span> = Rv_Mult_Norm(rv, x, sigma)
+
+    <span style="color: #859900;">return</span> rv_mult_norm.rvs()
+
+
+<span style="color: #859900;">class</span> <span style="color: #b58900;">Trunc_Gamma_Rv</span>(rv_continuous):
+
+    <span style="color: #859900;">def</span> <span style="color: #268bd2;">__init__</span>(<span style="color: #859900;">self</span>, alph, bet, mu):
+
+        <span style="color: #859900;">self</span>.alph = alph
+        <span style="color: #859900;">self</span>.bet = bet
+        <span style="color: #859900;">self</span>.mu = mu
+
+        <span style="color: #859900;">assert</span>(<span style="color: #6c71c4;">abs</span>(bet-<span style="color: #859900;">self</span>.get_b())&lt;0.01)
+        <span style="color: #859900;">self</span>.K_ab = <span style="color: #859900;">self</span>.get_K()
+
+        rv_continuous.__init__(<span style="color: #859900;">self</span>, a=0, b=1)
+
+    <span style="color: #859900;">def</span> <span style="color: #268bd2;">get_b</span>(<span style="color: #859900;">self</span>):
+        <span style="color: #b58900;">root_f</span> = <span style="color: #859900;">lambda</span> bet: integrate.quad(
+            <span style="color: #859900;">lambda</span> x: x*fT(x,<span style="color: #859900;">self</span>.alph,bet),0,1)[0] - <span style="color: #859900;">self</span>.mu
+        <span style="color: #859900;">return</span> brentq(root_f, 0.5*<span style="color: #859900;">self</span>.mu/<span style="color: #859900;">self</span>.alph, 5*<span style="color: #859900;">self</span>.mu/<span style="color: #859900;">self</span>.alph)
+
+    <span style="color: #859900;">def</span> <span style="color: #268bd2;">get_K</span>(<span style="color: #859900;">self</span>):
+        <span style="color: #b58900;">a</span>,<span style="color: #b58900;">b</span> = <span style="color: #859900;">self</span>.alph, <span style="color: #859900;">self</span>.bet
+        <span style="color: #b58900;">int_f_0_1</span> = integrate.quad(
+            <span style="color: #859900;">lambda</span> x: 1/(b**a*gamma(a))*x**(a-1)*np.exp(-x/b),0,1)
+        <span style="color: #b58900;">K_ab</span> = 1./(int_f_0_1[0])
+        <span style="color: #859900;">return</span> K_ab
+
+    <span style="color: #859900;">def</span> <span style="color: #268bd2;">_pdf</span>(<span style="color: #859900;">self</span>, x):
+        <span style="color: #859900;">if</span> x &lt; 0:
+            <span style="color: #b58900;">fT_ab</span> = 0
+        <span style="color: #859900;">elif</span> x&gt;1:
+            <span style="color: #b58900;">fT_ab</span> = 0
+        <span style="color: #859900;">else</span>:
+            <span style="color: #b58900;">fT_ab</span> = <span style="color: #859900;">self</span>.K_ab * 1/(<span style="color: #859900;">self</span>.bet**<span style="color: #859900;">self</span>.alph*gamma(<span style="color: #859900;">self</span>.alph))\
+                    *x**(<span style="color: #859900;">self</span>.alph-1)*np.exp(-x/<span style="color: #859900;">self</span>.bet)
+
+        <span style="color: #859900;">return</span> fT_ab
+</pre>
+</div>
+
+
+<p>
+Then to get the data, for example for \(\alpha=0.248\), the following code is executed saving every data point as a dictionary item for full transparency and reproducibility.<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900;">if</span> <span style="color: #6c71c4;">__name__</span> == <span style="color: #2aa198;">'__main__'</span>:
+
+    <span style="color: #859900;">from</span> params.sigma_dep_network_params <span style="color: #859900;">import</span> *
+    <span style="color: #859900;">import</span> os, pickle
+
+    <span style="color: #b58900;">data_frame</span> = []
+    <span style="color: #b58900;">label</span> = <span style="color: #2aa198;">"4_alpha_0-05_sigma.p"</span>
+
+    <span style="color: #859900;">with</span> <span style="color: #6c71c4;">open</span>(<span style="color: #2aa198;">"data/"</span> + label, <span style="color: #2aa198;">"wb"</span>) <span style="color: #859900;">as</span> pfile:
+        pickle.dump(data_frame, pfile)
+
+    <span style="color: #859900;">for</span> alph, bet <span style="color: #859900;">in</span> <span style="color: #6c71c4;">zip</span>(alphas,betas):
+
+        <span style="color: #b58900;">rv</span> = Trunc_Gamma_Rv(alph, bet, mu)
+
+        <span style="color: #859900;">for</span> sigma <span style="color: #859900;">in</span> np.arange(sig_low, sig_high, sig_step):
+
+            <span style="color: #859900;">for</span> k <span style="color: #859900;">in</span> <span style="color: #6c71c4;">range</span>(n_trials):
+
+                <span style="color: #859900;">print</span>(<span style="color: #2aa198;">"a: "</span>, alph, <span style="color: #2aa198;">"\t sigma: "</span>, sigma, <span style="color: #2aa198;">"\t No.: "</span>, k+1)
+
+                <span style="color: #b58900;">data</span> = {<span style="color: #2aa198;">"alpha"</span>: alph, <span style="color: #2aa198;">"beta"</span>: bet, <span style="color: #2aa198;">"mu"</span>: mu, <span style="color: #2aa198;">"sigma"</span>: sigma}
+
+                <span style="color: #b58900;">xs</span> = rv.rvs(size=n_pairs)
+                <span style="color: #b58900;">ys</span> = []
+                <span style="color: #859900;">for</span> x <span style="color: #859900;">in</span> xs:
+                    <span style="color: #b58900;">y</span> = sample_rv_mult_norm(x, rv, sigma)
+                    ys.append(y)
+
+                <span style="color: #b58900;">data</span>[<span style="color: #2aa198;">"xs"</span>]=xs
+                <span style="color: #b58900;">data</span>[<span style="color: #2aa198;">"ys"</span>]=np.array(ys)
+
+                data_frame.append(data)
+
+                os.rename(<span style="color: #2aa198;">"data/"</span> + label, <span style="color: #2aa198;">"tmp/"</span> + label)
+                <span style="color: #859900;">with</span> <span style="color: #6c71c4;">open</span>(<span style="color: #2aa198;">"data/"</span> + label, <span style="color: #2aa198;">"wb"</span>) <span style="color: #859900;">as</span> pfile:
+                    pickle.dump(data_frame, pfile)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3">Computation in generated networks</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+Finally we also tested this method by generating networks with such defined connection probabilities and extracted the relative overrepresentation \(\varrho\).<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900;">from</span> __future__ <span style="color: #859900;">import</span> print_function
+
+<span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
+<span style="color: #859900;">from</span> scipy.stats <span style="color: #859900;">import</span> norm
+<span style="color: #859900;">from</span> scipy.stats <span style="color: #859900;">import</span> rv_continuous
+
+<span style="color: #859900;">import</span> resource
+
+<span style="color: #859900;">def</span> <span style="color: #268bd2;">populate_triu</span>(P, c_rv):
+    <span style="color: #2aa198;">'''</span>
+<span style="color: #2aa198;">    Populates the upper triangle of P with connection probabilities</span>
+<span style="color: #2aa198;">    sampled from c_rv. P_ij is the probability for a connection from</span>
+<span style="color: #2aa198;">    node i to node j.  </span>
+<span style="color: #2aa198;">    ----------</span>
+<span style="color: #2aa198;">    P     :  matrix of connection probabiities</span>
+<span style="color: #2aa198;">    c_rv  :  randomly returns connection probability</span>
+<span style="color: #2aa198;">    '''</span>
+
+    <span style="color: #b58900;">rows</span>, <span style="color: #b58900;">cols</span> = np.triu_indices_from(P, k=1)
+
+    <span style="color: #859900;">for</span> i,j <span style="color: #859900;">in</span> <span style="color: #6c71c4;">zip</span>(rows,cols):
+        P[i][j] = c_rv.rvs()
+
+    <span style="color: #859900;">assert</span>(np.<span style="color: #6c71c4;">max</span>(P)&lt;=1)
+    <span style="color: #859900;">assert</span>(np.<span style="color: #6c71c4;">min</span>(P)&gt;=0)
+
+    <span style="color: #859900;">return</span> P
+
+
+<span style="color: #859900;">def</span> <span style="color: #268bd2;">populate_tril</span>(P, c_rvy, params):
+    <span style="color: #2aa198;">'''</span>
+<span style="color: #2aa198;">    Populates the lower triangle of P with connection probabilities</span>
+<span style="color: #2aa198;">    sampled from c_rv, given the corr_method.</span>
+<span style="color: #2aa198;">    ----------</span>
+<span style="color: #2aa198;">    P           :  matrix of connection probabiities</span>
+<span style="color: #2aa198;">    c_rvy      :  class for sampling correlated connection probabilities</span>
+<span style="color: #2aa198;">    '''</span>
+
+    <span style="color: #b58900;">rows</span>, <span style="color: #b58900;">cols</span> = np.triu_indices_from(P, k=1)
+
+    <span style="color: #859900;">for</span> i,j <span style="color: #859900;">in</span> <span style="color: #6c71c4;">zip</span>(rows,cols):
+        <span style="color: #b58900;">c_rvy.x</span> = P[i][j]
+        <span style="color: #b58900;">c_rvy.sigma</span> = params[<span style="color: #2aa198;">"sigma"</span>]
+        <span style="color: #b58900;">c_rvy.norm_f</span> = c_rvy.compute_norm_f()
+        P[j][i] = c_rvy.rvs()
+
+    <span style="color: #859900;">assert</span>(np.<span style="color: #6c71c4;">max</span>(P)&lt;=1)
+    <span style="color: #859900;">assert</span>(np.<span style="color: #6c71c4;">min</span>(P)&gt;=0)
+
+    <span style="color: #859900;">return</span> P
+
+
+<span style="color: #859900;">class</span> <span style="color: #b58900;">C_rv_mult_norm</span>(rv_continuous):
+    <span style="color: #2aa198;">'''</span>
+<span style="color: #2aa198;">    normal modulated random variable for P_ji given P_ij=x</span>
+<span style="color: #2aa198;">    and width sigma</span>
+<span style="color: #2aa198;">    '''</span>
+
+    <span style="color: #859900;">def</span> <span style="color: #268bd2;">__init__</span>(<span style="color: #859900;">self</span>, c_rv, x, sigma):
+
+        <span style="color: #859900;">self</span>.c_rv = c_rv
+        <span style="color: #859900;">self</span>.x = x
+        <span style="color: #859900;">self</span>.sigma = sigma
+
+        <span style="color: #859900;">self</span>.norm_f = <span style="color: #859900;">self</span>.compute_norm_f()
+
+        rv_continuous.__init__(<span style="color: #859900;">self</span>, a=0, b=1)
+
+    <span style="color: #859900;">def</span> <span style="color: #268bd2;">compute_norm_f</span>(<span style="color: #859900;">self</span>):
+        <span style="color: #859900;">return</span> integrate.quad(<span style="color: #859900;">lambda</span> y: <span style="color: #859900;">self</span>.c_rv.pdf(y)\
+                              *norm.pdf(y, loc=<span style="color: #859900;">self</span>.x, scale=<span style="color: #859900;">self</span>.sigma),
+                              0, 1)[0]
+
+    <span style="color: #859900;">def</span> <span style="color: #268bd2;">_pdf</span>(<span style="color: #859900;">self</span>, y):
+        <span style="color: #859900;">return</span> <span style="color: #859900;">self</span>.c_rv.pdf(y)*1/<span style="color: #859900;">self</span>.norm_f\
+               * norm.pdf(y, loc=<span style="color: #859900;">self</span>.x, scale=<span style="color: #859900;">self</span>.sigma)
+
+
+
+<span style="color: #859900;">def</span> <span style="color: #268bd2;">connect_network</span>(P):
+
+    <span style="color: #b58900;">rel</span> = np.random.uniform(size=np.shape(P))
+
+    <span style="color: #859900;">return</span> (P&gt;rel).astype(<span style="color: #6c71c4;">int</span>)
+
+
+<span style="color: #859900;">def</span> <span style="color: #268bd2;">generate_network</span>(N, c_rv, params):
+
+    <span style="color: #b58900;">P</span> = np.zeros((N,N))
+    <span style="color: #b58900;">P</span> = populate_triu(P, c_rv)
+    <span style="color: #b58900;">c_rvy</span> = C_rv_mult_norm(c_rv, 1, params[<span style="color: #2aa198;">"sigma"</span>])
+    <span style="color: #b58900;">P</span> = populate_tril(P, c_rvy, params)
+    <span style="color: #b58900;">G</span> = connect_network(P)
+
+    <span style="color: #859900;">return</span> G
+
+<span style="color: #859900;">def</span> <span style="color: #268bd2;">compute_overrep</span>(G):
+
+    <span style="color: #b58900;">N</span> = <span style="color: #6c71c4;">len</span>(G)
+
+    <span style="color: #b58900;">U</span> = (G+G.T)[np.triu_indices(N,1)]
+
+    <span style="color: #b58900;">n_recip</span>  = <span style="color: #6c71c4;">float</span>(<span style="color: #6c71c4;">len</span>(U[np.where(U==2)]))
+
+    <span style="color: #b58900;">p_bar</span> = np.<span style="color: #6c71c4;">sum</span>(G)/<span style="color: #6c71c4;">float</span>((N*(N-1)))                
+    <span style="color: #b58900;">n_recip_bar</span> = p_bar**2*N*(N-1)/2.
+
+    <span style="color: #859900;">return</span> n_recip/n_recip_bar
+</pre>
+</div>
+
+<p>
+For example, for <code>a=1</code>, we collect the data as follows<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900;">if</span> <span style="color: #6c71c4;">__name__</span> == <span style="color: #2aa198;">'__main__'</span>:
+
+    <span style="color: #859900;">import</span> os, pickle
+
+    <span style="color: #859900;">from</span> gamma_functions <span style="color: #859900;">import</span> *
+
+    <span style="color: #b58900;">a</span> = 1.
+    <span style="color: #b58900;">mu</span> = 0.1
+
+    <span style="color: #b58900;">c_rv</span> = Trunc_gamma(a, mu)
+
+    <span style="color: #b58900;">N</span> = 250
+    <span style="color: #b58900;">trials</span> = 5
+
+    <span style="color: #b58900;">df</span> = []
+
+    <span style="color: #b58900;">label</span> = <span style="color: #2aa198;">"a_1_sig_05_set5.p"</span>
+    <span style="color: #859900;">with</span> <span style="color: #6c71c4;">open</span>(<span style="color: #2aa198;">"data/"</span> + label, <span style="color: #2aa198;">"wb"</span>) <span style="color: #859900;">as</span> pfile:
+        pickle.dump(df, pfile)
+
+    <span style="color: #859900;">for</span> sig <span style="color: #859900;">in</span> np.arange(0.05, 0.45, 0.05):
+        <span style="color: #b58900;">params</span> = {<span style="color: #2aa198;">"sigma"</span>: sig}
+        <span style="color: #859900;">for</span> i <span style="color: #859900;">in</span> <span style="color: #6c71c4;">range</span>(trials):
+            <span style="color: #b58900;">data</span> = {}
+            <span style="color: #b58900;">G</span> = generate_network(N, c_rv, params)
+            <span style="color: #b58900;">rho</span> = compute_overrep(G)
+            <span style="color: #b58900;">data</span>[<span style="color: #2aa198;">"rho"</span>] = rho
+            <span style="color: #b58900;">data</span>[<span style="color: #2aa198;">"sig"</span>] = params[<span style="color: #2aa198;">"sigma"</span>]
+            <span style="color: #b58900;">data</span>[<span style="color: #2aa198;">"mu"</span>]  = <span style="color: #6c71c4;">float</span>(np.<span style="color: #6c71c4;">sum</span>(G))/(N*(N-1))
+            <span style="color: #b58900;">data</span>[<span style="color: #2aa198;">"N"</span>] = <span style="color: #6c71c4;">len</span>(G)
+            <span style="color: #b58900;">data</span>[<span style="color: #2aa198;">"alpha"</span>] = c_rv.alph
+            <span style="color: #b58900;">data</span>[<span style="color: #2aa198;">"beta"</span>] = c_rv.bet
+
+            df.append(data)
+
+            <span style="color: #859900;">print</span>( sig )
+            <span style="color: #859900;">print</span>( <span style="color: #2aa198;">"\t rho         : "</span>, rho )
+            <span style="color: #859900;">print</span>( <span style="color: #2aa198;">"\t mu          : "</span>, <span style="color: #6c71c4;">float</span>(np.<span style="color: #6c71c4;">sum</span>(G))/(N*(N-1)))
+
+            os.rename(<span style="color: #2aa198;">"data/"</span> + label, <span style="color: #2aa198;">"tmp/"</span> + label)
+            <span style="color: #859900;">with</span> <span style="color: #6c71c4;">open</span>(<span style="color: #2aa198;">"data/"</span> + label, <span style="color: #2aa198;">"wb"</span>) <span style="color: #859900;">as</span> pfile:
+                pickle.dump(df, pfile)
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><b>Plotting the figure</b></h2>
+<div class="outline-text-2" id="text-2">
+<p>
+With the above methods we generated data and plotted the figure<br  />
+</p>
+
+<img src="{{ site.baseurl }}/assets/img/fig3B.png" width="60%" style="display:block;margin:2em auto 2em;"/>
+
+<p>
+where the red data points were obtained from the generated networks and were not shown in the article. The graphic was created with the following code<br  />
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900;">import</span> matplotlib <span style="color: #859900;">as</span> mpl
+mpl.use(<span style="color: #2aa198;">'Agg'</span>)
+<span style="color: #859900;">import</span> pylab <span style="color: #859900;">as</span> pl
+
+<span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
+<span style="color: #859900;">from</span> scipy.stats <span style="color: #859900;">import</span> sem
+<span style="color: #859900;">import</span> pickle
+
+<span style="color: #859900;">from</span> matplotlib <span style="color: #859900;">import</span> rc
+
+rc(<span style="color: #2aa198;">'text'</span>, usetex=<span style="color: #6c71c4;">True</span>)
+<span style="color: #b58900;">pl.rcParams</span>[<span style="color: #2aa198;">'text.latex.preamble'</span>] = [
+    r<span style="color: #2aa198;">'\usepackage{tgheros}'</span>,    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">helvetica font</span>
+    r<span style="color: #2aa198;">'\usepackage{sansmath}'</span>,   <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">math-font matching helvetica</span>
+    r<span style="color: #2aa198;">'\sansmath'</span>                <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">actually tell tex to use it!</span>
+    r<span style="color: #2aa198;">'\usepackage{siunitx}'</span>,    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">micro symbols</span>
+    r<span style="color: #2aa198;">'\sisetup{detect-all}'</span>,    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">force siunitx to use the fonts</span>
+]  
+
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">-----  data from numerical integration -----</span>
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">a=1</span>
+<span style="color: #859900;">with</span> <span style="color: #6c71c4;">open</span>(<span style="color: #2aa198;">"data/th_a1_mu01.p"</span>, <span style="color: #2aa198;">"rb"</span>) <span style="color: #859900;">as</span> pfile:
+    <span style="color: #b58900;">df_a1</span> = pickle.load(pfile)
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">data for sigma=0 from Figure 2    </span>
+<span style="color: #b58900;">t_sigs_a1</span> = [0]
+<span style="color: #b58900;">t_rhos_a1</span> = [1.996]
+
+<span style="color: #b58900;">t_sigs_a1</span> += [d[<span style="color: #2aa198;">"sigma"</span>] <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df_a1]
+<span style="color: #b58900;">t_rhos_a1</span> += [d[<span style="color: #2aa198;">"numer"</span>]/(1./4*(d[<span style="color: #2aa198;">"den_x"</span>]+d[<span style="color: #2aa198;">"den_y"</span>])**2) <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df_a1]
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">a=2</span>
+<span style="color: #859900;">with</span> <span style="color: #6c71c4;">open</span>(<span style="color: #2aa198;">"data/th_a2_mu01.p"</span>, <span style="color: #2aa198;">"rb"</span>) <span style="color: #859900;">as</span> pfile:
+    <span style="color: #b58900;">df_a2</span> = pickle.load(pfile)
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">data for sigma=0 from Figure </span>
+<span style="color: #b58900;">t_sigs_a2</span> = [0]
+<span style="color: #b58900;">t_rhos_a2</span> = [1.500]
+
+<span style="color: #b58900;">t_sigs_a2</span> = [d[<span style="color: #2aa198;">"sigma"</span>] <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df_a2]
+<span style="color: #b58900;">t_rhos_a2</span> = [d[<span style="color: #2aa198;">"numer"</span>]/(1./4*(d[<span style="color: #2aa198;">"den_x"</span>]+d[<span style="color: #2aa198;">"den_y"</span>])**2) <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df_a2]
+
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">-----  data from sampling connection probabilities -----</span>
+
+<span style="color: #859900;">with</span> <span style="color: #6c71c4;">open</span>(<span style="color: #2aa198;">"data/4_alpha_0-05_sigma.p"</span>, <span style="color: #2aa198;">"rb"</span>) <span style="color: #859900;">as</span> pfile:
+    <span style="color: #b58900;">df</span> = pickle.load(pfile)
+
+<span style="color: #b58900;">alph</span> = 0.248
+<span style="color: #b58900;">x</span> = [d <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df <span style="color: #859900;">if</span> d[<span style="color: #2aa198;">"alpha"</span>]==alph]
+
+<span style="color: #b58900;">sample_sigs</span> = <span style="color: #6c71c4;">list</span>(<span style="color: #6c71c4;">set</span>([d[<span style="color: #2aa198;">"sigma"</span>] <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> x]))
+<span style="color: #b58900;">rhos_a0248</span> = []
+<span style="color: #b58900;">rhos_a0248_sem</span> = []
+
+<span style="color: #859900;">for</span> sigma <span style="color: #859900;">in</span> sample_sigs:    
+    <span style="color: #b58900;">df_sig</span> = [d <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> x <span style="color: #859900;">if</span> d[<span style="color: #2aa198;">"sigma"</span>]==sigma]
+    <span style="color: #b58900;">rhos_sig</span> = [np.mean(d[<span style="color: #2aa198;">"xs"</span>]*d[<span style="color: #2aa198;">"ys"</span>])\
+                * 1/(np.mean(np.concatenate((d[<span style="color: #2aa198;">"xs"</span>],d[<span style="color: #2aa198;">"ys"</span>])))**2)\
+                <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df_sig]
+    rhos_a0248.append(np.mean(rhos_sig))
+    rhos_a0248_sem.append(sem(rhos_sig))
+
+
+<span style="color: #b58900;">alph</span> = 1.
+<span style="color: #b58900;">x</span> = [d <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df <span style="color: #859900;">if</span> d[<span style="color: #2aa198;">"alpha"</span>]==alph]
+
+<span style="color: #b58900;">sample_sigs_a1</span> = <span style="color: #6c71c4;">list</span>(<span style="color: #6c71c4;">set</span>([d[<span style="color: #2aa198;">"sigma"</span>] <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> x]))
+<span style="color: #b58900;">rhos_a1</span> = []
+<span style="color: #b58900;">rhos_a1_sem</span> = []
+
+<span style="color: #859900;">for</span> sigma <span style="color: #859900;">in</span> sample_sigs_a1:
+    <span style="color: #b58900;">df_sig</span> = [d <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> x <span style="color: #859900;">if</span> d[<span style="color: #2aa198;">"sigma"</span>]==sigma]
+    <span style="color: #b58900;">rhos_sig</span> = [np.mean(d[<span style="color: #2aa198;">"xs"</span>]*d[<span style="color: #2aa198;">"ys"</span>])\
+                * 1/(np.mean(np.concatenate((d[<span style="color: #2aa198;">"xs"</span>],d[<span style="color: #2aa198;">"ys"</span>])))**2)\
+                <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df_sig]
+    rhos_a1.append(np.mean(rhos_sig))
+    rhos_a1_sem.append(sem(rhos_sig))
+
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">----- fit for alpha=0.248 sampled data -----</span>
+
+<span style="color: #b58900;">xs</span> = np.arange(0.,0.7,0.001)
+<span style="color: #b58900;">ys</span> = 1.086317 + (4.043159 - 1.086317)/(1 + (xs/0.2587529)**3.275628)
+
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">----- data from generated networks -----</span>
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">a = 1</span>
+<span style="color: #859900;">with</span> <span style="color: #6c71c4;">open</span>(<span style="color: #2aa198;">"data/gn_a1_sig05.p"</span>, <span style="color: #2aa198;">"rb"</span>) <span style="color: #859900;">as</span> pfile:
+    <span style="color: #b58900;">df</span> = pickle.load(pfile, encoding=<span style="color: #2aa198;">'latin1'</span>)
+
+<span style="color: #b58900;">gn_a1_sample_sigs</span> = <span style="color: #6c71c4;">list</span>(<span style="color: #6c71c4;">set</span>([d[<span style="color: #2aa198;">"sig"</span>] <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df]))
+
+<span style="color: #b58900;">gn_a1_rhos</span> = []
+<span style="color: #b58900;">gn_a1_rho_sems</span> = []
+<span style="color: #859900;">for</span> sig <span style="color: #859900;">in</span> gn_a1_sample_sigs:
+    <span style="color: #b58900;">df_sig</span>  = [d <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df <span style="color: #859900;">if</span> d[<span style="color: #2aa198;">"sig"</span>]==sig]
+    gn_a1_rhos.append(np.mean([d[<span style="color: #2aa198;">"rho"</span>] <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df_sig]))
+    gn_a1_rho_sems.append(sem([d[<span style="color: #2aa198;">"rho"</span>] <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df_sig]))
+
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #657b83; font-style: italic;">a = 2</span>
+<span style="color: #859900;">with</span> <span style="color: #6c71c4;">open</span>(<span style="color: #2aa198;">"data/gn_a2_sig05.p"</span>, <span style="color: #2aa198;">"rb"</span>) <span style="color: #859900;">as</span> pfile:
+    <span style="color: #b58900;">df</span> = pickle.load(pfile, encoding=<span style="color: #2aa198;">'latin1'</span>)
+
+<span style="color: #b58900;">gn_a2_sample_sigs</span> = <span style="color: #6c71c4;">list</span>(<span style="color: #6c71c4;">set</span>([d[<span style="color: #2aa198;">"sig"</span>] <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df]))
+
+<span style="color: #b58900;">gn_a2_rhos</span> = []
+<span style="color: #b58900;">gn_a2_rho_sems</span> = []
+<span style="color: #859900;">for</span> sig <span style="color: #859900;">in</span> gn_a2_sample_sigs:
+    <span style="color: #b58900;">df_sig</span>  = [d <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df <span style="color: #859900;">if</span> d[<span style="color: #2aa198;">"sig"</span>]==sig]
+    gn_a2_rhos.append(np.mean([d[<span style="color: #2aa198;">"rho"</span>] <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df_sig]))
+    gn_a2_rho_sems.append(sem([d[<span style="color: #2aa198;">"rho"</span>] <span style="color: #859900;">for</span> d <span style="color: #859900;">in</span> df_sig]))
+
+
+
+
+<span style="color: #b58900;">fig</span>, <span style="color: #b58900;">ax</span> = pl.subplots(1,1)
+fig.set_size_inches(7.5*0.5,2.3)
+
+pl.plot(xs,ys, <span style="color: #2aa198;">'k'</span>, label=r<span style="color: #2aa198;">'$\alpha=0.248$'</span>)
+(_, caps, _) = pl.errorbar(sample_sigs, rhos_a0248, yerr=rhos_a0248_sem,
+                           fmt=<span style="color: #2aa198;">"None"</span>, ecolor=<span style="color: #2aa198;">'k'</span>, elinewidth=1.5,)
+<span style="color: #859900;">for</span> cap <span style="color: #859900;">in</span> caps:
+    cap.set_markeredgewidth(0.8)
+
+pl.plot(t_sigs_a1, t_rhos_a1, <span style="color: #2aa198;">'k'</span>, linestyle=<span style="color: #2aa198;">':'</span>, label=r<span style="color: #2aa198;">'$\alpha=1$'</span>)
+pl.plot(t_sigs_a2, t_rhos_a2, <span style="color: #2aa198;">'k'</span>, linestyle=<span style="color: #2aa198;">'--'</span>, label=r<span style="color: #2aa198;">'$\alpha=2$'</span>)
+
+(_, caps, _) = pl.errorbar(gn_a1_sample_sigs, gn_a1_rhos, yerr=gn_a1_rho_sems,
+                           fmt=<span style="color: #2aa198;">"None"</span>, ecolor = <span style="color: #2aa198;">'r'</span>, elinewidth=1.5,)
+<span style="color: #859900;">for</span> cap <span style="color: #859900;">in</span> caps:
+    cap.set_markeredgewidth(0.8)
+
+(_, caps, _) = pl.errorbar(gn_a2_sample_sigs, gn_a2_rhos, yerr=gn_a2_rho_sems,
+                           fmt=<span style="color: #2aa198;">"None"</span>, ecolor = <span style="color: #2aa198;">'r'</span>, elinewidth=1.5,)
+<span style="color: #859900;">for</span> cap <span style="color: #859900;">in</span> caps:
+    cap.set_markeredgewidth(0.8)
+
+pl.xticks([0.,0.1,0.2,0.3,0.4,0.5,0.6])
+
+ax.set_title(r<span style="color: #2aa198;">'$f_{P_{ij}}(y) = f_{\alpha,\beta}^T(y)$'</span>, size=13.)
+pl.xlim(0,0.6)
+pl.ylim(1.,4.05)
+
+pl.legend(prop={<span style="color: #2aa198;">'size'</span>:12})
+
+pl.xlabel(r<span style="color: #2aa198;">'width $\sigma$'</span>)
+pl.ylabel(r<span style="color: #2aa198;">'relative occurrence $\varrho$'</span>)
+
+pl.savefig(<span style="color: #2aa198;">'fig3B.pdf'</span>, dpi=600, bbox_inches=<span style="color: #2aa198;">'tight'</span>)
+</pre>
+</div>
+</div>
+</div>

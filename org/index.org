@@ -1,5 +1,5 @@
 #+STARTUP: noindent showeverything
-#+OPTIONS: toc:nil; html-postamble:nil
+#+OPTIONS: toc:nil; html-postamble:nil; ^:nil
 #+BEGIN_HTML
 ---
 layout: default
@@ -9,9 +9,14 @@ title: About
 
 * *About*
 
-Documentation for the numerical computations and code for the research article /Non-random network connectivity comes in pairs/, Felix Z. Hoffmann, Jochen Triesch, 2016.
+Documentation for the numerical computations and code for the research article 
 
-A preprint is available at [[http://arxiv.org/abs/1609.04245][arXiv:1609.04245]].
+#+BEGIN_QUOTE 
+Hoffmann, F.Z., & Triesch, J. (2017). Nonrandom network connectivity comes in pairs. /Network Neuroscience 1/, 31–41. [[http://doi.org/10.1162/netn_a_00004][doi.org/10.1162/netn_a_00004]]
+#+END_QUOTE
+
+
+# A preprint is available at [[http://arxiv.org/abs/1609.04245][arXiv:1609.04245]].
 
 * *License*
 

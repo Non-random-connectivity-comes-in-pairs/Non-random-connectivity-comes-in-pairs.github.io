@@ -1,6 +1,6 @@
 # Site title and subtitle. This is used in _includes/header.html
 title: 'Non-random connectivity comes in pairs'
-subtitle: 'Documentation for research article arXiv:1609.04245'
+subtitle: 'Documentation for research article <i>DOI:10.1162/netn_a_00004</i>'
 
 # if you wish to integrate disqus on pages set your shortname here
 disqus_shortname: ''
